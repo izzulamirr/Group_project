@@ -4,77 +4,65 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Profile;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
-    public function main()
+    public function edit()
     {
-        $profiles = Profile::all();
-        return view ('transactions.index')->with('transaction',$profiles);
+        $user = Auth::user();
+        return view('profile.edit', compact('user'));
     }
 
-    public function create1()
+    public function update(Request $request)
     {
-        return view('transactions.create');
+        $user = Auth::user();
+
+        // Validate the input
+        $request->validate([
+            'nickname' => 'nullable|string|max:255',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8|confirmed',
+            'phone_no' => 'nullable|string|max:15',
+            'city' => 'nullable|string|max:255',
+        ]);
+
+        // Update user fields
+        $user->nickname = $request->nickname ?? $user->nickname;
+        $user->email = $request->email;
+        $user->phone_no = $request->phone_no ?? $user->phone_no;
+        $user->city = $request->city ?? $user->city;
+
+        // Handle avatar upload
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar) {
+                Storage::delete($user->avatar); // Delete old avatar
+            }
+            $user->avatar = $request->file('avatar')->store('avatars');
+        }
+
+        // Handle password change
+        if ($request->password) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return redirect()->route('profile.edit')->with('success', 'Profile updated successfully.');
     }
 
-/**
-     * Display a listing of the resource.
-     ** @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     
-     */
-
-    public function store1(Request $request)
+    public function destroy(Request $request)
     {
-        $input = $request->all();
-        Profile::create($input);
-        return redirect('transaction')->with('flash_message','Transaction Added!');
+        $user = Auth::user();
+
+        // Delete user record
+        $user->delete();
+
+        // Logout the user
+        Auth::logout();
+
+        return redirect()->route('thome')->with('success', 'Account deleted successfully.');
     }
-
-
-/**
-     * Display a specific resources
-     ** @param int $id
-     * @return \Illuminate\Http\Response
-     */
-
-     public function show1($id)
-     {
-         $profiles = Profile::find($id);
-         return view('transactions.view')->with('transactions', $profiles);
-     }
-
-     public function edit1($id)
-     {
-         $profiles = Profile::find($id);
-         return view('transactions.edit')->with('transactions', $profiles);
-     }
-
-     /**
-     * update a specific resources
-     ** @param \Illuminate\Http\Request $request
-     ** @param int $id
-     *  @return \Illuminate\Http\Response
-     */
-
-     public function update1(Request $request, $id)
-     {
-        
-        $profiles = Profile::findOrFail($id);
-        $input = $request->all();
-
-    $amount = $request->input('amount');
-        
-        $profiles->update($input);
-
-        return redirect('transaction')->with('flash_message', 'Transaction Updated!');
-     }
-
-     public function destroy1($id)
-     {
-        Transaction::destroy($id);
-        return redirect('transaction')->with('flash_message','Transaction Deleted!');    
-     }
 }

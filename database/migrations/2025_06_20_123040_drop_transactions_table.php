@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-            Schema::dropIfExists('transactions');
-
+        // Drop the table directly
+        Schema::dropIfExists('transactions');
     }
 
     /**
@@ -20,6 +20,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        // Optionally, recreate the table if needed
+        Schema::create('transactions', function (Blueprint $table) {
+            $table->id();
+            // Add other columns and constraints as needed
+        });
     }
 };

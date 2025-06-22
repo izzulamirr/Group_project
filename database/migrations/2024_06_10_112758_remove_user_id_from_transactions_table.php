@@ -12,10 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('transactions', function (Blueprint $table) {
-           
+            // Check if the 'user_id' column exists before dropping it
+            if (Schema::hasColumn('transactions', 'user_id')) {
                 $table->dropColumn('user_id');
-            });
-   
+            }
+        });
     }
 
     /**
@@ -24,7 +25,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('transactions', function (Blueprint $table) {
-            //
+            // Optionally, re-add the 'user_id' column if needed
+            $table->unsignedBigInteger('user_id')->nullable();
         });
     }
 };

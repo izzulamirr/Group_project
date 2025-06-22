@@ -15,8 +15,16 @@ return new class extends Migration
             $table->string('Name')->nullable(false)->change(); // Revert back if necessary
             $table->decimal('amount', 8, 2)->nullable(false)->change(); // Revert back if necessary
             $table->text('remarks')->nullable(false)->change(); // Revert back if necessary
-            $table->json('changes')->nullable();
-            $table->decimal('target', 10, 2)->nullable()->after('changes');
+
+            // Check if the 'changes' column exists before adding it
+            if (!Schema::hasColumn('transactions', 'changes')) {
+                $table->json('changes')->nullable();
+            }
+
+            // Check if the 'target' column exists before adding it
+            if (!Schema::hasColumn('transactions', 'target')) {
+                $table->decimal('target', 10, 2)->nullable()->after('changes');
+            }
         });
     }
 
@@ -29,8 +37,16 @@ return new class extends Migration
             $table->string('Name')->nullable(false)->change(); // Revert back if necessary
             $table->decimal('amount', 8, 2)->nullable(false)->change(); // Revert back if necessary
             $table->text('remarks')->nullable(false)->change(); // Revert back if necessary
-            $table->dropColumn('changes'); // Revert back if necessary
-            $table->dropColumn('target_amount');
+
+            // Drop the 'changes' column if it exists
+            if (Schema::hasColumn('transactions', 'changes')) {
+                $table->dropColumn('changes');
+            }
+
+            // Drop the 'target' column if it exists
+            if (Schema::hasColumn('transactions', 'target')) {
+                $table->dropColumn('target');
+            }
         });
     }
 };

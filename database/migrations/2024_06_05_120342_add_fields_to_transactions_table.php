@@ -12,10 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('transactions', function (Blueprint $table) {
-            $table->string('Name')->nullable()->change(); // If Name already exists and needs to be nullable
-            $table->decimal('amount', 8, 2)->nullable()->change(); // If amount already exists and needs to be nullable
-            $table->text('remarks')->nullable()->change(); // If remarks already exists and needs to be nullable
-            $table->json('changes')->nullable()->change(); // If changes already exists and needs to be nullable
+            // Modify existing columns to be nullable
+            $table->string('Name')->nullable()->change();
+            $table->decimal('amount', 8, 2)->nullable()->change();
+            $table->text('remarks')->nullable()->change();
+
+            // Check if the 'changes' column exists before modifying it
+            if (Schema::hasColumn('transactions', 'changes')) {
+                $table->json('changes')->nullable()->change();
+            }
         });
     }
 
@@ -25,10 +30,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('transactions', function (Blueprint $table) {
-            $table->string('Name')->nullable(false)->change(); // Revert back if necessary
-            $table->decimal('amount', 8, 2)->nullable(false)->change(); // Revert back if necessary
-            $table->text('remarks')->nullable(false)->change(); // Revert back if necessary
-            $table->dropColumn('changes'); // Revert back if necessary
+            // Revert columns back to non-nullable
+            $table->string('Name')->nullable(false)->change();
+            $table->decimal('amount', 8, 2)->nullable(false)->change();
+            $table->text('remarks')->nullable(false)->change();
+
+            // Check if the 'changes' column exists before dropping it
+            if (Schema::hasColumn('transactions', 'changes')) {
+                $table->dropColumn('changes');
+            }
         });
     }
 };

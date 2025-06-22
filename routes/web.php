@@ -5,7 +5,7 @@ use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\DonatorController;
-
+use App\Http\Controllers\ProfileController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -31,6 +31,17 @@ Route::get('/thank', function () {
     return view('transactions.thank');
 })->name('transaction.thank');
 
+Route::get('/profile/edit', function () {
+    return view('profile.edit');
+})->name('profile.edit');
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
+
+Route::get('/dashhome', function () {
+    return view('dashhome'); // Replace 'dashhome' with the name of your Blade view file
+})->name('dashhome');
 
 // Organization management routes (only for logged-in users)
 Route::middleware('auth')->group(function () {
@@ -40,6 +51,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/organizations/{organization}/edit', [OrganizationController::class, 'edit'])->name('organizations.edit');
     Route::put('/organizations/{organization}', [OrganizationController::class, 'update'])->name('organizations.update');
     Route::delete('/organizations/{organization}', [OrganizationController::class, 'destroy'])->name('organizations.destroy');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // Show all organizations (for donation listing)

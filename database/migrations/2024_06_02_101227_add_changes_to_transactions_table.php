@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('transactions', function (Blueprint $table) {
+            // Add the 'changes' column
             $table->json('changes')->nullable();
         });
     }
@@ -22,7 +23,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('transactions', function (Blueprint $table) {
-            $table->dropcolumn('changes');
+            // Check if the 'changes' column exists before dropping it
+            if (Schema::hasColumn('transactions', 'changes')) {
+                $table->dropColumn('changes');
+            }
         });
     }
 };
