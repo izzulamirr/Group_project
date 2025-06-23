@@ -137,7 +137,7 @@
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
             <ul class="navbar-nav align-items-center">
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('thome') ? 'active' : '' }}" href="{{ route('thome') }}">
+                    <a class="nav-link {{ request()->routeIs('Orgdashboard') ? 'active' : '' }}" href="{{ route('Orgdashboard') }}">
                         <i class="fa-solid fa-house me-1"></i> Dashboard Home
                     </a>
                 </li>
@@ -147,25 +147,39 @@
                     </a>
                 </li>
                 <!-- User Icon and Name -->
-               @auth
-<li class="nav-item d-flex align-items-center ms-3">
-    <a href="{{ route('profile.edit') }}" class="d-flex align-items-center text-decoration-none">
+              @auth
+    <li class="nav-item dropdown ms-3">
+    <a class="nav-link dropdown-toggle d-flex align-items-center text-decoration-none" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
         <i class="fa-solid fa-user-circle fa-lg me-2 text-primary"></i>
         <span class="fw-semibold text-dark">{{ Auth::user()->name }}</span>
     </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+        <li>
+            <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                <i class="fa-solid fa-user-gear me-2"></i> Profile
+            </a>
+        </li>
+        @php
+            $role = \App\Models\UserRole::where('UserID', Auth::id())->first();
+        @endphp
+        @if($role && $role->RoleID == 1)
+        <li>
+            <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
+                <i class="fa-solid fa-gauge me-2"></i> Admin Dashboard
+            </a>
+        </li>
+        @endif
+        <li><hr class="dropdown-divider"></li>
+        <li>
+            <a class="dropdown-item text-danger" href="{{ route('logout') }}"
+               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+            </a>
+        </li>
+    </ul>
 </li>
 @endauth
-                <li class="nav-item">
-                    <a class="nav-link text-white fw-semibold px-3 py-2" 
-                       style="background: linear-gradient(90deg, #dc3545 0%, #fd7e14 100%); border-radius: 20px;"
-                       href="{{ route('transaction.logout') }}"
-                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
-                    </a>
-                    <form id="logout-form" action="{{ route('transaction.logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                </li>
+                
             </ul>
         </div>
     </div>
@@ -188,8 +202,12 @@
     </footer>
 
     <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Font Awesome -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+    @csrf
+</form>
 </body>
 </html>

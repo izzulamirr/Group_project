@@ -6,6 +6,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\DonatorController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\RegistrationController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -19,13 +22,12 @@ Route::get('/', function () {
 Route::get('/home', function () {
     return view('transactions.homepage');
 })->name('dashhome');
-Route::get('/home', function () {
-    return view('Organization.dashhome');
-})->name('thome');
 
-Route::get('/login', function () {
-    return view('auth.login'); // or your login view path
-})->name('login');
+Route::get('/dashboard', function () {
+    return view('Organization.dashboard');
+})->name('Orgdashboard');
+
+
 
 Route::get('/thank', function () {
     return view('transactions.thank');
@@ -35,13 +37,24 @@ Route::get('/profile/edit', function () {
     return view('profile.edit');
 })->name('profile.edit');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
 
-Route::get('/dashhome', function () {
-    return view('dashhome'); // Replace 'dashhome' with the name of your Blade view file
-})->name('dashhome');
+
+Route::get('/dashboard', function () {
+    return view('Organization.dashboard'); // Replace 'dashhome' with the name of your Blade view file
+})->name('Orgdashboard');
+
+
+Route::middleware(['auth', 'admin'])->get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+
+Route::get('/admin/user/{user}/organizations', [AdminController::class, 'userOrganizations'])
+    ->name('admin.user.organizations');
+
+// Admin user management routes
+Route::get('/admin/user/{user}/permissions', [AdminController::class, 'editPermissions'])->name('admin.user.permissions');
+Route::post('/admin/user/{user}/permissions', [AdminController::class, 'updatePermissions'])->name('admin.user.permissions.update');
+Route::get('/admin/user/create', [AdminController::class, 'createUser'])->name('admin.user.create');
+Route::post('/admin/user/store', [AdminController::class, 'storeUser'])->name('admin.user.store');
+Route::delete('/admin/user/{userId}', [AdminController::class, 'deleteUser'])->name('admin.user.delete');
 
 // Organization management routes (only for logged-in users)
 Route::middleware('auth')->group(function () {
@@ -55,14 +68,25 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+Route::middleware(['auth', 'permission:Create Organization', 'permission:Create Transaction'])->group(function () {
+    Route::get('/organization/create', [OrganizationController::class, 'create'])->name('organization.create');
+    Route::post('/organization', [OrganizationController::class, 'store'])->name('organization.store');
+
+    Route::get('/transaction/create', [TransactionController::class, 'create'])->name('transaction.create');
+    Route::post('/transaction', [TransactionController::class, 'store'])->name('transaction.store');
+});
 
 // Show all organizations (for donation listing)
 Route::get('/organizations', [OrganizationController::class, 'index'])->name('organizations.index');
 Route::get('/organizations/{organization}/transactions', [OrganizationController::class, 'transactions'])->name('organizations.transactions');
 // Auth routes
-Route::post('login', [AuthController::class, 'loginWithEmail'])->name('login');
-Route::post('register', [AuthController::class, 'registerWithEmail'])->name('register');
-Route::post('transaction/logout', [AuthController::class, 'logout'])->name('transaction.logout');
+
+
+Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('login', [LoginController::class, 'login']);
+Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::post('register', [RegistrationController::class, 'register'])->name('register');
 
 
 Route::get('/donate', [DonatorController::class, 'donateForm'])->name('transaction.donate');
@@ -77,7 +101,5 @@ Route::put('organizations/{organization}/transactions/{transaction}', [Transacti
 Route::delete('organizations/{organization}/transactions/{transaction}', [TransactionController::class, 'destroy'])->name('organizations.transactions.destroy');
 
 
-
-Route::get('/servertime', function () {
-    return now();
-});
+//logout
+Route::post('logout', [LoginController::class, 'logout'])->name('logout');

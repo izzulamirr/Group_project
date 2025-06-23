@@ -105,12 +105,12 @@
                         </li>
                     @else
                         <li class="nav-item">
-                            <a class="nav-link btn text-white px-4 py-2" href="{{ route('dashboard') }}">
+                            <a class="nav-link btn text-white px-4 py-2" href="{{ route('Orgdashboard') }}">
                                 <i class="fa-solid fa-gauge me-1"></i> Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <form action="{{ route('transaction.logout') }}" method="POST" style="display:inline;">
+                            <form action="{{ route('logout') }}" method="POST" style="display:inline;">
                                 @csrf
                                 <button type="submit" class="nav-link btn btn-danger text-white px-4 py-2" style="border:none; background:none;">
                                     <i class="fa-solid fa-sign-out-alt me-1"></i> Logout

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RegistrationRequest;
 use App\Models\User;
+use App\Models\UserRole;
+use Illuminate\Support\Facades\Auth;
 
 class RegistrationController extends Controller
 {
@@ -18,7 +20,17 @@ class RegistrationController extends Controller
             'password' => bcrypt($request->password),
         ]);
 
-        // Redirect or return response
-        return redirect()->route('dashboard')->with('success', 'Registration successful!');
+        // Assign default role (RoleID = 2, RoleName = 'user')
+       UserRole::create([
+        'UserID' => $user->id,
+        'RoleName' => 'user',
+        'Description' => 'Normal user',
+        ]);
+
+        // Log the user in
+        Auth::login($user);
+
+        // Redirect to dashboard or home
+        return redirect()->route('Orgdashboard')->with('success', 'Registration successful!');
     }
 }

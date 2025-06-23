@@ -1,7 +1,6 @@
 @extends('Organization.layout')
 @section('content')
 <div class="container py-4">
-   
 
     <!-- Card for Organization List -->
     <div class="card shadow-lg border-0 rounded-4">
@@ -20,9 +19,19 @@
                 </div>
             @endif
 
+            @php
+                $role = \App\Models\UserRole::where('UserID', Auth::id())->first();
+                $canCreate = $role ? \App\Models\RolePermission::where('RoleID', $role->RoleID)->where('Description', 'Create Organization')->exists() : false;
+                $canEdit = $role ? \App\Models\RolePermission::where('RoleID', $role->RoleID)->where('Description', 'Update Organization')->exists() : false;
+                $canDelete = $role ? \App\Models\RolePermission::where('RoleID', $role->RoleID)->where('Description', 'Delete Organization')->exists() : false;
+            @endphp
+
+            @if($canCreate)
             <a href="{{ route('organizations.create') }}" class="btn btn-success mb-3 rounded-pill px-4 py-2" title="Add new Organization">
                 <i class="fa-solid fa-plus me-1"></i> Add Organization
             </a>
+            @endif
+
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
@@ -43,9 +52,12 @@
                                 <a href="{{ route('organizations.transactions', $organization->id) }}" class="btn btn-info btn-sm rounded-pill mb-1">
                                     <i class="fa-solid fa-eye me-1"></i> View Transactions
                                 </a>
+                                @if($canEdit)
                                 <a href="{{ route('organizations.edit', $organization->id) }}" class="btn btn-primary btn-sm rounded-pill mb-1">
                                     <i class="fa-solid fa-pen-to-square me-1"></i> Edit
                                 </a>
+                                @endif
+                                @if($canDelete)
                                 <form method="POST" action="{{ route('organizations.destroy', $organization->id) }}" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
@@ -54,6 +66,7 @@
                                         <i class="fa-solid fa-trash me-1"></i> Delete
                                     </button>
                                 </form>
+                                @endif
                             </td>
                         </tr>
                         @endforeach
@@ -69,8 +82,4 @@
     </div>
 </div>
 
-<!-- Font Awesome CDN for icons -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-<!-- Bootstrap 5 JS (for navbar toggler) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 @endsection

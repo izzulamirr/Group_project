@@ -5,9 +5,20 @@
     @if(session('flash_message'))
         <div class="alert alert-success">{{ session('flash_message') }}</div>
     @endif
+
+    @php
+        $role = \App\Models\UserRole::where('UserID', Auth::id())->first();
+        $canCreate = $role ? \App\Models\RolePermission::where('RoleID', $role->RoleID)->where('Description', 'Create Transaction')->exists() : false;
+        $canEdit = $role ? \App\Models\RolePermission::where('RoleID', $role->RoleID)->where('Description', 'Update Transaction')->exists() : false;
+        $canDelete = $role ? \App\Models\RolePermission::where('RoleID', $role->RoleID)->where('Description', 'Delete Transaction')->exists() : false;
+    @endphp
+
+    @if($canCreate)
     <a href="{{ route('organizations.transactions.create', $organization->id) }}" class="btn btn-success mb-3">
         <i class="fa fa-plus"></i> Add Transaction
     </a>
+    @endif
+
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -26,13 +37,17 @@
                 <td>{{ $transaction->remarks }}</td>
                 <td>{{ $transaction->created_at }}</td>
                 <td>
+                    @if($canEdit)
                     <a href="{{ route('organizations.transactions.edit', [$organization->id, $transaction->id]) }}" class="btn btn-primary btn-sm">Edit</a>
+                    @endif
+                    @if($canDelete)
                     <form action="{{ route('organizations.transactions.destroy', [$organization->id, $transaction->id]) }}" method="POST" style="display:inline;">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger btn-sm"
                             onclick="return confirm('Delete this transaction?')">Delete</button>
                     </form>
+                    @endif
                 </td>
             </tr>
            @endforeach
