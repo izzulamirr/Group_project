@@ -5,13 +5,8 @@
     <form action="{{ route('organizations.transactions.store', $organization->id) }}" method="POST">
         @csrf
         <div class="mb-3">
-            <label>Donator</label>
-            <select name="donator_id" class="form-control" required>
-                <option value="">Select Donator</option>
-                @foreach($donators as $donator)
-                    <option value="{{ $donator->id }}">{{ $donator->Name1 }}</option>
-                @endforeach
-            </select>
+            <label>Donator Name</label>
+            <input type="text" name="donator_name" class="form-control" placeholder="Enter donator name" required>
         </div>
         <div class="mb-3">
             <label>Amount</label>

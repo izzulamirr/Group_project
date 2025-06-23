@@ -147,14 +147,14 @@
                     </a>
                 </li>
                 <!-- User Icon and Name -->
-                @auth
-                <li class="nav-item d-flex align-items-center ms-3">
-                    <span class="d-flex align-items-center">
-                        <i class="fa-solid fa-user-circle fa-lg me-2 text-primary"></i>
-                        <span class="fw-semibold text-dark">{{ Auth::user()->name }}</span>
-                    </span>
-                </li>
-                @endauth
+               @auth
+<li class="nav-item d-flex align-items-center ms-3">
+    <a href="{{ route('profile.edit') }}" class="d-flex align-items-center text-decoration-none">
+        <i class="fa-solid fa-user-circle fa-lg me-2 text-primary"></i>
+        <span class="fw-semibold text-dark">{{ Auth::user()->name }}</span>
+    </a>
+</li>
+@endauth
                 <li class="nav-item">
                     <a class="nav-link text-white fw-semibold px-3 py-2" 
                        style="background: linear-gradient(90deg, #dc3545 0%, #fd7e14 100%); border-radius: 20px;"

@@ -27,30 +27,32 @@ class TransactionController extends Controller
 
     // Store a new transaction for a specific organization
     public function store(Request $request, $organization_id)
-    {
-        $organization = Organization::findOrFail($organization_id);
-        $request->validate([
-            'donator_id' => 'required|exists:donators,id',
-            'amount' => 'required|numeric|min:0.01',
-            'remarks' => 'nullable|string',
-        ]);
-        Transaction::create([
-            'organization_id' => $organization->id,
-            'donator_id' => $request->donator_id,
-            'amount' => $request->amount,
-            'remarks' => $request->remarks,
-        ]);
-        return redirect()->route('organizations.transactions', $organization->id)
-            ->with('flash_message', 'Transaction added!');
-    }
+{
+    $organization = Organization::findOrFail($organization_id);
 
-    // Show edit form for a transaction
-    public function edit($organization_id, Transaction $transaction)
-    {
-        $organization = Organization::findOrFail($organization_id);
-        $donators = Donator::all();
-        return view('transactions.edit', compact('organization', 'transaction', 'donators'));
-    }
+    $request->validate([
+        'donator_name' => 'required|string|max:255',
+        'amount' => 'required|numeric|min:0.01',
+        'remarks' => 'nullable|string',
+    ]);
+
+    // Create new donator
+    $donator = Donator::create([
+        'Name1' => $request->donator_name,
+        // add other fields if needed
+    ]);
+
+    // Create transaction
+    Transaction::create([
+        'organization_id' => $organization->id,
+        'donator_id' => $donator->id,
+        'amount' => $request->amount,
+        'remarks' => $request->remarks,
+    ]);
+
+    return redirect()->route('organizations.transactions', $organization->id)
+        ->with('flash_message', 'Transaction added!');
+}
 
     // Update a transaction
     public function update(Request $request, $organization_id, Transaction $transaction)

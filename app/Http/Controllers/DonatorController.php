@@ -30,10 +30,13 @@ class DonatorController extends Controller
         $totalAmount = array_sum(array_column($request->donations, 'amount'));
 
         // Create the donator ONCE per submission
-        $donator = Donator::create([
-            'Name1' => $request->donator_name, // or 'Name1' if that's your column
-            'amount' => $totalAmount,
-        ]);
+        $donator = Donator::create(['Name1' => $request->donator_name]);
+        Transaction::create([
+        'organization_id' => $organization->id,
+        'donator_id' => $donator->id,
+        'amount' => $request->amount,
+        'remarks' => $request->remarks,
+]);
 
         // Create a transaction for each donation row
         foreach ($request->donations as $donation) {

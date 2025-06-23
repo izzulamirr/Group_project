@@ -75,3 +75,9 @@ Route::post('organizations/{organization}/transactions', [TransactionController:
 Route::get('organizations/{organization}/transactions/{transaction}/edit', [TransactionController::class, 'edit'])->name('organizations.transactions.edit');
 Route::put('organizations/{organization}/transactions/{transaction}', [TransactionController::class, 'update'])->name('organizations.transactions.update');
 Route::delete('organizations/{organization}/transactions/{transaction}', [TransactionController::class, 'destroy'])->name('organizations.transactions.destroy');
+
+
+
+Route::get('/servertime', function () {
+    return now();
+});
