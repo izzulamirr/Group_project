@@ -25,6 +25,15 @@ class TransactionController extends Controller
         return view('transactions.create', compact('organization', 'donators'));
     }
 
+    public function edit($organizationId, $transactionId)
+{
+    $organization = Organization::findOrFail($organizationId);
+    $transaction = Transaction::findOrFail($transactionId);
+    $donators = Donator::all(); // or filter by organization if needed
+
+    return view('transactions.edit', compact('organization', 'transaction', 'donators'));
+}
+
     // Store a new transaction for a specific organization
     public function store(Request $request, $organization_id)
 {
@@ -34,6 +43,7 @@ class TransactionController extends Controller
         'donator_name' => 'required|string|max:255',
         'amount' => 'required|numeric|min:0.01',
         'remarks' => 'nullable|string',
+        
     ]);
 
     // Create new donator
@@ -55,21 +65,31 @@ class TransactionController extends Controller
 }
 
     // Update a transaction
-    public function update(Request $request, $organization_id, Transaction $transaction)
-    {
-        $request->validate([
-            'donator_id' => 'required|exists:donators,id',
-            'amount' => 'required|numeric|min:0.01',
-            'remarks' => 'nullable|string',
-        ]);
-        $transaction->update([
-            'donator_id' => $request->donator_id,
-            'amount' => $request->amount,
-            'remarks' => $request->remarks,
-        ]);
-        return redirect()->route('organizations.transactions', $organization_id)
-            ->with('flash_message', 'Transaction updated!');
+    public function update(Request $request, $organizationId, $transactionId)
+{
+    $request->validate([
+        'donator_id' => 'required|exists:donators,id',
+        'amount' => 'required|numeric|min:0',
+        'remarks' => 'nullable|string|max:255',
+        'receipt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+    ]);
+
+    $transaction = Transaction::findOrFail($transactionId);
+
+    // Handle file upload
+    if ($request->hasFile('receipt')) {
+        $path = $request->file('receipt')->store('receipts', 'public');
+        $transaction->receipt = $path;
     }
+
+    $transaction->donator_id = $request->donator_id;
+    $transaction->amount = $request->amount;
+    $transaction->remarks = $request->remarks;
+    $transaction->save();
+
+    return redirect()->route('organizations.transactions', $organizationId)
+        ->with('success', 'Transaction updated successfully.');
+}
 
     // Delete a transaction
     public function destroy($organization_id, Transaction $transaction)

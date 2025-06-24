@@ -11,67 +11,9 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <!-- Custom CSS -->
-    <style>
-        body {
-            font-family: 'Montserrat', Arial, sans-serif;
-            background: #f8fafc;
-        }
-        .navbar {
-            background: linear-gradient(90deg, #0d6efd 0%, #0dcaf0 100%);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .navbar-brand img {
-            border-radius: 10px;
-        }
-        .nav-link.btn {
-            margin-right: 0.5rem;
-            border-radius: 20px;
-            transition: background 0.2s, color 0.2s;
-        }
-        .nav-link.btn-warning {
-            color: #212529 !important;
-            font-weight: 600;
-        }
-        .nav-link.btn-warning:hover {
-            background: #ffc107cc !important;
-        }
-        .nav-link.btn.text-white:hover {
-            background: #0dcaf0;
-            color: #fff !important;
-        }
-        .feature-item {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
-            padding: 2rem 1.5rem;
-            margin-bottom: 2rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .feature-item:hover {
-            transform: translateY(-6px) scale(1.03);
-            box-shadow: 0 8px 32px rgba(13, 202, 240, 0.15);
-        }
-        .feature-item i {
-            color: #0d6efd;
-            margin-bottom: 1rem;
-        }
-        .footer {
-            background: #0d6efd;
-            color: #fff;
-            border-top-left-radius: 24px;
-            border-top-right-radius: 24px;
-            margin-top: 4rem;
-        }
-        .footer a {
-            color: #ffc107;
-            text-decoration: underline;
-        }
-        @media (max-width: 767px) {
-            .feature-item {
-                margin-bottom: 1.5rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <!-- Script -->
+    <script src="{{ asset('js/script.js') }}"></script>
 </head>
 <body>
 

@@ -26,6 +26,7 @@
                 <th>Amount</th>
                 <th>Remarks</th>
                 <th>Donation Date</th>
+                <th>Receipt</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -36,6 +37,13 @@
                 <td>{{ $transaction->amount }}</td>
                 <td>{{ $transaction->remarks }}</td>
                 <td>{{ $transaction->created_at }}</td>
+                <td>
+                    @if($transaction->receipt)
+                        <a href="{{ asset('storage/' . $transaction->receipt) }}" target="_blank">View Receipt</a>
+                    @else
+                        No Receipt
+                    @endif
+                </td>
                 <td>
                     @if($canEdit)
                     <a href="{{ route('organizations.transactions.edit', [$organization->id, $transaction->id]) }}" class="btn btn-primary btn-sm">Edit</a>

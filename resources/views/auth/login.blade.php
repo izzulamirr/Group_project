@@ -1,44 +1,52 @@
-<x-guest-layout class="bg-custom-color bg-cover bg-center">
-    <x-authentication-card>
-        <x-slot name="logo">
-            <x-authentication-card-logo />
-        </x-slot>
+@extends('layouts.auth')
 
-        <x-validation-errors class="mb-4" />
+@section('content')
+<div class="login-center" style="min-height:100vh;display:flex;justify-content:center;align-items:center;">
+    <div class="card p-4 shadow" style="min-width:350px;max-width:400px;width:100%;">
+        <div class="text-center mb-4">
+            <img src="{{ asset('images/logo.png') }}" alt="Smart Fund" style="width:64px;height:64px;">
+            <h2 class="mt-2 mb-0" style="font-weight:700;">Login</h2>
+        </div>
+
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         @if (session('status'))
-            <div class="mb-4 font-medium text-sm text-green-600">
+            <div class="alert alert-success mb-3">
                 {{ session('status') }}
             </div>
         @endif
 
         <form method="POST" action="{{ route('login') }}">
             @csrf
-            <!-- Your form fields (e.g., email, password) -->
-            <div>
-                <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="email" />
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input id="email" class="form-control" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="email">
             </div>
-            <div class="mt-4">
-                <x-label for="password" value="{{ __('Password') }}" />
-                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" />
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input id="password" class="form-control" type="password" name="password" required autocomplete="current-password">
             </div>
-            <div class="block mt-4">
-                <label for="remember_me" class="flex items-center">
-                    <x-checkbox id="remember_me" name="remember" />
-                    <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-                </label>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="remember_me" name="remember">
+                <label class="form-check-label" for="remember_me">Remember me</label>
             </div>
-            <div class="flex items-center justify-end mt-4">
+            <div class="d-flex justify-content-between align-items-center">
                 @if (Route::has('password.request'))
-                    <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                        {{ __('Forgot your password?') }}
+                    <a class="small" href="{{ route('password.request') }}">
+                        Forgot your password?
                     </a>
                 @endif
-                <x-button class="ms-4">
-                    {{ __('Log in') }}
-                </x-button>
+                <button type="submit" class="btn btn-primary px-4">Log in</button>
             </div>
         </form>
-    </x-authentication-card>
-</x-guest-layout>
+    </div>
+</div>
+@endsection

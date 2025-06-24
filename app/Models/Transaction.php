@@ -13,6 +13,7 @@ class Transaction extends Model
         'donator_id',
         'amount',
         'remarks',
+        'receipt', // Assuming you want to include receipt in the fillable attributes
     ];
 
     public function organization()

@@ -88,7 +88,6 @@ class AdminController extends Controller
                 foreach ($request->permissions as $perm) {
                     RolePermission::create([
                         'RoleID' => $userRole->RoleID,
-                        'UserID' => $userId, // Add this if you want to track which user
                         'Description' => $perm,
                     ]);
                 }

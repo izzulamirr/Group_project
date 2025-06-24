@@ -1,8 +1,10 @@
 @extends('Organization.layout')
+
+
 @section('content')
 <div class="container">
     <h3>Edit Transaction for {{ $organization->name }}</h3>
-    <form action="{{ route('organizations.transactions.update', [$organization->id, $transaction->id]) }}" method="POST">
+    <form action="{{ route('organizations.transactions.update', [$organization->id, $transaction->id]) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <div class="mb-3">
@@ -23,6 +25,10 @@
         <div class="mb-3">
             <label>Remarks</label>
             <input type="text" name="remarks" class="form-control" value="{{ $transaction->remarks }}">
+        </div>
+        <div class="mb-3">
+            <label>Receipt</label>
+            <input type="file" name="receipt" class="form-control">
         </div>
         <button type="submit" class="btn btn-success">Update</button>
         <a href="{{ route('organizations.transactions', $organization->id) }}" class="btn btn-secondary">Cancel</a>
