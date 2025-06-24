@@ -1,45 +1,40 @@
-<x-guest-layout>
-    <x-authentication-card>
-        <x-slot name="logo">
-            <x-authentication-card-logo />
-        </x-slot>
+@extends('layouts.layout')
 
-        <div class="mb-4 text-sm text-gray-600">
-            {{ __('Before continuing, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
-        </div>
-
+@section('content')
+<div class="container mt-5" style="max-width: 400px;">
+    <h4 class="mb-3">Email Verification Required</h4>
+    <div class="mb-4 text-muted">
+        Before continuing, please enter the verification code sent to your email address.
         @if (session('status') == 'verification-link-sent')
-            <div class="mb-4 font-medium text-sm text-green-600">
-                {{ __('A new verification link has been sent to the email address you provided in your profile settings.') }}
+            <div class="alert alert-success mt-2">
+                A new verification code has been sent to your email address.
             </div>
         @endif
+    </div>
 
-        <div class="mt-4 flex items-center justify-between">
-            <form method="POST" action="{{ route('verification.send') }}">
-                @csrf
-
-                <div>
-                    <x-button type="submit">
-                        {{ __('Resend Verification Email') }}
-                    </x-button>
-                </div>
-            </form>
-
-            <div>
-                <a
-                    href="{{ route('profile.show') }}"
-                    class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                    {{ __('Edit Profile') }}</a>
-
-                <form method="POST" action="{{ route('logout') }}" class="inline">
-                    @csrf
-
-                    <button type="submit" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ms-2">
-                        {{ __('Log Out') }}
-                    </button>
-                </form>
-            </div>
+    <form method="POST" action="{{ route('verification.verify') }}">
+        @csrf
+        <div class="mb-3">
+            <label for="code" class="form-label">Verification Code</label>
+            <input type="text" name="code" id="code" class="form-control" required>
+            @error('code')
+                <div class="text-danger mt-1">{{ $message }}</div>
+            @enderror
         </div>
-    </x-authentication-card>
-</x-guest-layout>
+        <button type="submit" class="btn btn-primary w-100">Verify</button>
+    </form>
+
+    <form method="POST" action="{{ route('verification.resend') }}" class="mt-3">
+        @csrf
+        <button type="submit" class="btn btn-link">Resend Verification Code</button>
+    </form>
+
+    <div class="mt-3 d-flex justify-content-between">
+        <a href="{{ route('profile.edit') }}" class="text-decoration-underline">Edit Profile</a>
+        <form method="POST" action="{{ route('logout') }}" class="d-inline">
+            @csrf
+            <button type="submit" class="btn btn-link text-danger p-0">Log Out</button>
+        </form>
+    </div>
+</div>
+@endsection

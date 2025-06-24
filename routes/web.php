@@ -10,6 +10,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegistrationController;
 
+
+
 // Home and dashboard
 Route::get('/', function () {
     return view('homepage');
@@ -27,9 +29,7 @@ Route::get('/thank', function () {
     return view('transactions.thank');
 })->name('transaction.thank');
 
-Route::get('/profile/edit', function () {
-    return view('profile.edit');
-})->name('profile.edit');
+
 
 // --------------------
 // ADMIN-ONLY ROUTES
@@ -58,12 +58,14 @@ Route::middleware('auth')->group(function () {
 
     // Profile management
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    //Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // --------------------
-// PERMISSION-BASED ROUTES (if you have permission middleware)
+// PERMISSION-BASED ROUTES
 // --------------------
 Route::middleware(['auth', 'permission:Create Organization', 'permission:Create Transaction'])->group(function () {
     Route::get('/organization/create', [OrganizationController::class, 'create'])->name('organization.create');

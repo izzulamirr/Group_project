@@ -1,4 +1,4 @@
-@extends('Organization.layout')
+@extends('layouts.layout')
 @section('content')
 <div class="container mt-4">
     <h3>Add Transaction for {{ $organization->name }}</h3>

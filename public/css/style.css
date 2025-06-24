@@ -25,25 +25,34 @@ body {
     background: #e6e7e7;
     color: #0d6efd !important;
 }
+
+/* Login/Register buttons: black font by default, white on hover */
 .main-navbar .nav-link.btn.text-white[href*="login"],
 .main-navbar .nav-link.btn.text-white[href*="register"],
-.navbar .nav-link.btn.text-white[href*="donate"],
-
 .navbar .nav-link.btn.text-white[href*="login"],
 .navbar .nav-link.btn.text-white[href*="register"] {
     color: #000 !important;
- 
 }
 .main-navbar .nav-link.btn.text-white[href*="login"]:hover,
 .main-navbar .nav-link.btn.text-white[href*="register"]:hover,
 .navbar .nav-link.btn.text-white[href*="login"]:hover,
 .navbar .nav-link.btn.text-white[href*="register"]:hover {
     background: #e3f2fd !important;
-    color: #edeef1 !important;
+    color: #fff !important;
     border-color: #0d6efd !important;
 }
 
-
+/* Donate button: always black font, even on hover */
+.main-navbar .nav-link.btn.text-white[href*="donate"],
+.navbar .nav-link.btn.text-white[href*="donate"] {
+    color: #000 !important;
+}
+.main-navbar .nav-link.btn.text-white[href*="donate"]:hover,
+.navbar .nav-link.btn.text-white[href*="donate"]:hover {
+    color: #000 !important;
+    background: #e3f2fd !important;
+    border-color: #0d6efd !important;
+}
 
 .login-container {
     min-height: 100vh;

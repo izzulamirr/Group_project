@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
+use App\Models\User;
+
 
 class ProfileController extends Controller
 {
@@ -21,30 +22,17 @@ class ProfileController extends Controller
 
         // Validate the input
         $request->validate([
-            'nickname' => 'nullable|string|max:255',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
-            'phone_no' => 'nullable|string|max:15',
-            'city' => 'nullable|string|max:255',
         ]);
 
         // Update user fields
-        $user->nickname = $request->nickname ?? $user->nickname;
+        $user->name = $request->name;
         $user->email = $request->email;
-        $user->phone_no = $request->phone_no ?? $user->phone_no;
-        $user->city = $request->city ?? $user->city;
-
-        // Handle avatar upload
-        if ($request->hasFile('avatar')) {
-            if ($user->avatar) {
-                Storage::delete($user->avatar); // Delete old avatar
-            }
-            $user->avatar = $request->file('avatar')->store('avatars');
-        }
 
         // Handle password change
-        if ($request->password) {
+        if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
 

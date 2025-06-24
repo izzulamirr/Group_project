@@ -1,4 +1,4 @@
-@extends('Organization.layout')
+@extends('layouts.layout')
 @section('content')
 
 @php

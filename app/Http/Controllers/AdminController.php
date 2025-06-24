@@ -14,8 +14,15 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        $users = User::with(['organizations.transactions'])->get();
-        return view('admin.dashboard', compact('users'));
+         $role =UserRole::where('UserID', auth()->id())->first();
+
+    // Only allow admin (RoleID == 1) to access
+    if (!$role || $role->RoleID != 1) {
+        abort(403); // Show custom 403 page for non-admins
+    }
+
+    $users = User::with(['organizations.transactions'])->get();
+    return view('admin.dashboard', compact('users'));
     }
 
     public function userOrganizations($userId)

@@ -1,4 +1,4 @@
-@extends('Organization.layout')
+@extends('layouts.layout')
 @section('content')
 <div class="container py-4">
     <h3>Organizations for {{ $user->name }}</h3>

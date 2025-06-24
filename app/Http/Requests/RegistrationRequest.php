@@ -22,7 +22,7 @@ class RegistrationRequest extends FormRequest
         return [
             'name' => 'required|regex:/^[A-Za-z]+$/|max:255', // Only A-Z and a-z allowed
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:7|confirmed',
+            'password' => 'required|string|min:7|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/',
         ];
     }
 
@@ -33,6 +33,7 @@ class RegistrationRequest extends FormRequest
     {
         return [
             'name.regex' => 'The name may only contain letters (A-Z and a-z).',
+            'password.regex' => 'The password must be at least 7 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.',
         ];
     }
 }
