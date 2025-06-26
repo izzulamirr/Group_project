@@ -52,9 +52,20 @@ $request->validate([
 Technique:
 Whitelist validation for type, length, format, and content.
 Parameterized queries via Eloquent ORM.
+
 3. Authentication
 Password Storage:
 Laravel uses bcrypt (strong, salted, one-way hashing).
+
+**resources/controllers/Auth/RegisterController.php
+use Illuminate\Support\Facades\Hash;
+
+$user = User::create([
+    'name' => $data['name'],
+    'email' => $data['email'],
+    'password' => Hash::make($data['password']),
+]);
+--
 Password Policies:
 Enforced via validation rules (min length, complexity recommended).
 Session Management:
@@ -65,7 +76,7 @@ TOTP 2FA enabled via Laravel Fortify.
 Can be enforced for admins/high-privilege users.
 Example:
 
-4. Authorization
+5. Authorization
 Vertical (Role-Based):
 The application uses a custom middleware called Checkpermission to enforce role-based access control.
 This middleware checks the current user's roles (from the UserRole model) and verifies if the user has permission to access the requested route by checking the RolePermission model.
