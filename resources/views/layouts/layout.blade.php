@@ -46,12 +46,13 @@
                         <i class="fa-solid fa-user-circle fa-lg me-2 text-primary"></i>
                         <span class="fw-semibold text-dark">{{ Auth::user()->name }}</span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li>
-                            <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                                <i class="fa-solid fa-user-gear me-2"></i> Profile
-                            </a>
-                        </li>
+                   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <li>
+                        <a class="dropdown-item" href="{{ route('profile.show') }}">
+                            <i class="fa-solid fa-user-gear me-2"></i> Profile
+                        </a>
+                    </li>
+                    
                         @php
                             $role = \App\Models\UserRole::where('UserID', Auth::id())->first();
                         @endphp
@@ -101,6 +102,8 @@
     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
         @csrf
     </form>
+    @yield('scripts')
+
 </body>
 </html>
 
