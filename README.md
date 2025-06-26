@@ -57,24 +57,56 @@ Parameterized queries via Eloquent ORM.
 Password Storage:
 Laravel uses bcrypt (strong, salted, one-way hashing).
 
-**resources/controllers/Auth/RegisterController.php
+**resources/controllers/Auth/RegisterController.php**
+```php
 use Illuminate\Support\Facades\Hash;
-
 $user = User::create([
     'name' => $data['name'],
     'email' => $data['email'],
     'password' => Hash::make($data['password']),
 ]);
---
+```
 Password Policies:
 Enforced via validation rules (min length, complexity recommended).
+**app/Http/Controllers/Auth/RegisterController.php**
+```php
+$request->validate([
+    'password' => [
+        'required',
+        'string',
+        'min:8',              // Minimum 8 characters
+        'regex:/[a-z]/',      // At least one lowercase letter
+        'regex:/[A-Z]/',      // At least one uppercase letter
+        'regex:/[0-9]/',      // At least one digit
+        'regex:/[@$!%*#?&]/', // At least one special character
+        'confirmed',          // Must match password_confirmation
+    ],
+]);
+```
 Session Management:
 Session IDs are strong, regenerated on login, invalidated on logout.
+**session.php**
+```php
+'secure' => env('SESSION_SECURE_COOKIE', true),
+'http_only' => true,
+'same_site' => 'lax',
+```
 Cookies are HttpOnly, Secure, SameSite.
+
 Multi-Factor Authentication:
 TOTP 2FA enabled via Laravel Fortify.
 Can be enforced for admins/high-privilege users.
 Example:
+**fortify.php**
+```php
+<?php
+'features' => [
+    // ...
+    Features::twoFactorAuthentication([
+        'confirmPassword' => true,
+    ]),
+],
+```
 
 5. Authorization
 Vertical (Role-Based):
