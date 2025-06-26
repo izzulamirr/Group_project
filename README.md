@@ -39,13 +39,15 @@ Server-side:
 Laravel $request->validate() for all forms.
 Example from TransactionController.php:
 
-<?php
+**resources/controllers/TransactionController.php**
+```php
 $request->validate([
     'donator_id' => 'required|exists:donators,id',
     'amount' => 'required|numeric|min:0',
     'remarks' => 'nullable|string|max:255',
     'receipt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
 ]);
+```
 
 Technique:
 Whitelist validation for type, length, format, and content.
