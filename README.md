@@ -13,7 +13,9 @@ Database Security Principles
 File Security Principles
 Additional Security Measures
 Brief Description
-This Laravel web application is a secure platform for managing organizations, transactions, and user accounts. It implements comprehensive security controls including input validation, authentication, authorization, XSS and CSRF prevention, database and file security, and additional security headers and measures, following OWASP and industry best practices.
+
+This Laravel web application is focused on secure donation transaction collection, ensuring that each registered user can only manage and access their own organization.
+
 
 Objective of the Enhancements
 The objective of this website enhancement is to significantly improve its security by implementing comprehensive measures: input validation, authentication and authorization, XSS and CSRF prevention, database security, file security, and additional security measures to address potential vulnerabilities and enhance overall protection.
@@ -32,57 +34,20 @@ All findings are low/medium risk with high confidence if not fixed.
 
 2. Input Validation
 Client-side:
-
+**Registration Form Example** 
+ 
 HTML5 validation (required, type, minlength, maxlength, pattern) in forms.
 Server-side:
-
-Laravel $request->validate() for all forms.
-Example from TransactionController.php:
-
-**resources/controllers/TransactionController.php**
-```php
-$request->validate([
-    'donator_id' => 'required|exists:donators,id',
-    'amount' => 'required|numeric|min:0',
-    'remarks' => 'nullable|string|max:255',
-    'receipt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-]);
-```
-
-Technique:
-Whitelist validation for type, length, format, and content.
-Parameterized queries via Eloquent ORM.
 
 3. Authentication
 Password Storage:
 Laravel uses bcrypt (strong, salted, one-way hashing).
 
-**resources/controllers/Auth/RegisterController.php**
-```php
-use Illuminate\Support\Facades\Hash;
-$user = User::create([
-    'name' => $data['name'],
-    'email' => $data['email'],
-    'password' => Hash::make($data['password']),
-]);
-```
+
 Password Policies:
 Enforced via validation rules (min length, complexity recommended).
 **app/Http/Controllers/Auth/RegisterController.php**
-```php
-$request->validate([
-    'password' => [
-        'required',
-        'string',
-        'min:8',              // Minimum 8 characters
-        'regex:/[a-z]/',      // At least one lowercase letter
-        'regex:/[A-Z]/',      // At least one uppercase letter
-        'regex:/[0-9]/',      // At least one digit
-        'regex:/[@$!%*#?&]/', // At least one special character
-        'confirmed',          // Must match password_confirmation
-    ],
-]);
-```
+
 Session Management:
 Session IDs are strong, regenerated on login, invalidated on logout.
 **session.php**
@@ -109,45 +74,204 @@ Example:
 ```
 
 5. Authorization
+
 Vertical (Role-Based):
 The application uses a custom middleware called Checkpermission to enforce role-based access control.
 This middleware checks the current user's roles (from the UserRole model) and verifies if the user has permission to access the requested route by checking the RolePermission model.
 If the user does not have the required permission for the route, a 403 Forbidden response is returned, preventing unauthorized access to protected resources.
 Middleware Example:
+**app\Http\Middleware\Checkpermission.php**
+```php
+public function handle(Request $request, Closure $next): Response
+{
+    // Get the current user's roles
+    $userRoles = UserRole::where('UserID', $request->user()->id)->pluck('RoleID');
 
+    // Check if the user has the required role for the requested route
+    $hasPermission = RolePermission::whereIn('RoleID', $userRoles)
+        ->where('Description', $request->route()->getName())
+        ->exists();
+
+    if (!$hasPermission) {
+        // If the user doesn't have permission, return a 403 response
+        return response()->json(['error' => 'Forbidden'], 403);
+    }
+
+    return $next($request);
+}
+```
 How it is applied:
 The Checkpermission middleware is registered in Kernel.php and applied to routes or route groups that require role-based access control.
 Example route usage:
 
+```php
+Route::middleware(['auth', 'checkpermission'])->group(function () {
+    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    // ...other protected routes
+});
+```
+
 Horizontal (User Data):
 In addition to role checks, controllers verify that users can only access or modify their own data, ensuring user-specific data protection.
+**app/Http/Controllers/TransactionController.php**
+```php 
+public function show($id)
+{
+    $transaction = Transaction::findOrFail($id);
+
+    // Ensure the authenticated user owns the transaction
+    if ($transaction->user_id !== auth()->id()) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    return view('transactions.show', compact('transaction'));
+}
+```
+
 5. XSS Prevention
-Blade Escaping (Default):
-Never use {!! $var !!} for user data.
+Blade Escaping:
+**resources\views\admin\CreateUser.blade.php**
+```php
+ <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input id="name" type="text" class="form-control @error('name') is-invalid @enderror"
+                   name="name" value="{{ old('name') }}" required autofocus>
+            @error('name')
+                <span class="invalid-feedback">{{ $message }}</span>
+            @enderror
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email address</label>
+            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror"
+                   name="email" value="{{ old('email') }}" required>
+            @error('email')
+                <span class="invalid-feedback">{{ $message }}</span>
+            @enderror
+        </div>
+```
+
 CSP header set in middleware.
+**app/Http/Middleware/SecurityHeaders.php**
+```php
+public function handle($request, Closure $next)
+{
+    $response = $next($request);
+    $response->headers->set('Content-Security-Policy', "default-src 'self'; script-src 'self';");
+    return $response;
+}
+```
+
 6. CSRF Prevention
 Blade Form Token:
 Laravel automatically validates CSRF tokens on POST/PUT/DELETE requests.
+**resources\views\profile\edit.blade.php**
+```php
+<form action="{{ route('profile.update') }}" method="POST">
+        @csrf
+
+        <div class="mb-3">
+            <label>Name</label>
+            <input type="text" name="name" class="form-control" value="{{ old('name', $user->name) }}" required>
+        </div>
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}" required>
+        </div>
+        <div class="mb-3">
+            <label>New Password <small class="text-muted">(leave blank to keep current password)</small></label>
+            <input type="password" name="password" class="form-control" autocomplete="new-password">
+        </div>
+        <div class="mb-3">
+            <label>Confirm New Password</label>
+            <input type="password" name="password_confirmation" class="form-control" autocomplete="new-password">
+        </div>
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+    </form>
+```
+
 7. Database Security Principles
 Eloquent ORM (Prevents SQL Injection):
-Prepared Statements (if using DB facade):
+```php
+$user = User::where('email', $email)->first();
+```
+
 Database user has least privilege (should not have DROP/ALTER rights).
-Use Laravel encrypted casts for sensitive fields if needed.
+**env**
+```php
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=GroupProject
+DB_USERNAME=groupproject_user
+DB_PASSWORD=Test123455
+```
+
 8. File Security Principles
 File Upload Validation and Storage:
+**// app/Http/Controllers/TransactionController.php**
+```php
+$request->validate([
+    'receipt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+]);
+
+if ($request->hasFile('receipt')) {
+    // For sensitive files, use 'private' disk instead of 'public'
+    $path = $request->file('receipt')->store('receipts', 'private');
+    $transaction->receipt = $path;
+}
+```
 .htaccess for Directory Listing (if using Apache):
-For sensitive files, use private disk and serve via controller.
-Set storage and cache to 755 and owned by web server user.
-Never use 777 permissions.
+```php
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
+```
+
+
 9. Additional Security Measures
 HTTPS enforced in production:
-\URL::forceScheme('https') in AppServiceProvider.
+**app/Providers/AppServiceProvider.php**
+```php
+public function boot()
+{
+    if (app()->environment('production')) {
+        \URL::forceScheme('https');
+    }
+}
+```
+
 HSTS header set:
 SecurityHeaders middleware.
+
+**app/Http/Middleware/SecurityHeaders.php**
+```php
+public function handle($request, Closure $next)
+{
+    $response = $next($request);
+    $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    return $response;
+}
+
+```
+
 Session timeout:
 Users are logged out after inactivity.
 Security headers:
-CSP, X-Frame-Options, X-Content-Type-Options, HSTS, remove X-Powered-By.
+**app/Http/Middleware/SecurityHeaders.php**
+```php
+public function handle($request, Closure $next)
+{
+    $response = $next($request);
+    $response->headers->set('Content-Security-Policy', "default-src 'self'; script-src 'self';");
+    $response->headers->set('X-Frame-Options', 'DENY');
+    $response->headers->set('X-Content-Type-Options', 'nosniff');
+    $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    $response->headers->remove('X-Powered-By');
+    return $response;
+}
+```
+
 References
 OWASP Top Ten
 Laravel Security Docs
@@ -161,236 +285,3 @@ Apply the above enhancements for full marks and best-practice compliance.
 
 
 
-To complete all the security features in the README file, I'll ensure that each section has detailed code examples, explanations, and best practices. Here's the enhanced version:
-
----
-
-# Ethical Shield Report  
-INFO 4345 | GroupProject  
-
-## Table of Contents  
-1. Vulnerability Report (OWASP ZAP)  
-2. Input Validation  
-3. Authentication  
-4. Authorization  
-5. XSS Prevention  
-6. CSRF Prevention  
-7. Database Security Principles  
-8. File Security Principles  
-9. Additional Security Measures  
-
----
-
-## Vulnerability Report (OWASP ZAP)  
-### Findings:  
-- **Cookie flags:**  
-  ✔️ Set `HttpOnly`, `Secure`, and `SameSite` in Laravel's session configuration.  
-  ```php
-  'secure' => env('SESSION_SECURE_COOKIE', true),
-  'http_only' => true,
-  'same_site' => 'lax',
-  ```
-- **X-Powered-By header:**  
-  ✔️ Removed in middleware to prevent exposing the framework.  
-  ```php
-  $response->headers->remove('X-Powered-By');
-  ```
-- **Content-Security-Policy (CSP):**  
-  ✔️ Defined in middleware to mitigate XSS attacks.  
-  ```php
-  $response->headers->set('Content-Security-Policy', "default-src 'self'; script-src 'self';");
-  ```
-- **Mixed Content or Self-Signed SSL:**  
-  ⚠️ Likely on localhost but resolved in production with valid SSL certificates.
-
----
-
-## Input Validation  
-### Client-Side Validation:  
-HTML5 validation is used for basic checks:  
-```html
-<input type="text" name="username" required minlength="3" maxlength="20" pattern="[A-Za-z0-9]+">
-```
-
-### Server-Side Validation:  
-Laravel's `$request->validate()` ensures robust validation:  
-```php
-$request->validate([
-    'donator_id' => 'required|exists:donators,id',
-    'amount' => 'required|numeric|min:0',
-    'remarks' => 'nullable|string|max:255',
-    'receipt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-]);
-```
-
-### Techniques:  
-- Whitelisting for type, length, and format.  
-- Parameterized queries via Eloquent ORM to prevent SQL Injection.
-
----
-
-## Authentication  
-### Password Storage:  
-Passwords are hashed with bcrypt:  
-```php
-use Illuminate\Support\Facades\Hash;
-
-$user = User::create([
-    'name' => $data['name'],
-    'email' => $data['email'],
-    'password' => Hash::make($data['password']),
-]);
-```
-
-### Password Policies:  
-Validation rules enforce strong passwords:  
-```php
-$request->validate([
-    'password' => [
-        'required',
-        'string',
-        'min:8',
-        'regex:/[a-z]/',      // Lowercase
-        'regex:/[A-Z]/',      // Uppercase
-        'regex:/[0-9]/',      // Numeric
-        'regex:/[@$!%*#?&]/', // Special character
-        'confirmed',          // Match confirmation
-    ],
-]);
-```
-
-### Multi-Factor Authentication (2FA):  
-Enabled via Laravel Fortify:  
-```php
-'features' => [
-    Features::twoFactorAuthentication([
-        'confirmPassword' => true,
-    ]),
-],
-```
-
----
-
-## Authorization  
-### Vertical Authorization (Role-Based):  
-Custom middleware enforces role-based access control:  
-```php
-public function handle($request, Closure $next, $permission)
-{
-    if (!auth()->user()->hasPermissionTo($permission)) {
-        abort(403, 'Unauthorized action.');
-    }
-    return $next($request);
-}
-```
-
-### Horizontal Authorization (User Data):  
-Controllers ensure users only access their data:  
-```php
-$transaction = Transaction::where('id', $id)
-    ->where('user_id', auth()->id())
-    ->firstOrFail();
-```
-
----
-
-## XSS Prevention  
-### Blade Escaping:  
-Always use `{{ $variable }}` for output:  
-```php
-<p>{{ $user->name }}</p> <!-- Escaped -->
-<p>{!! $trustedHtml !!}</p> <!-- Trusted -->
-```
-
-### Content Security Policy (CSP):  
-Defined in middleware to block malicious scripts:  
-```php
-$response->headers->set('Content-Security-Policy', "default-src 'self'; script-src 'self';");
-```
-
----
-
-## CSRF Prevention  
-### CSRF Tokens:  
-Laravel automatically includes CSRF tokens in forms:  
-```html
-<form method="POST" action="/submit">
-    @csrf
-    <input type="text" name="data">
-    <button type="submit">Submit</button>
-</form>
-```
-
----
-
-## Database Security Principles  
-### ORM Usage:  
-Use Eloquent ORM to prevent SQL injection:  
-```php
-$users = User::where('email', $email)->first();
-```
-
-### Least Privilege Principle:  
-Database user should only have necessary permissions (no `DROP` or `ALTER`).  
-
-### Encrypted Casts:  
-Sensitive fields are encrypted automatically:  
-```php
-protected $casts = [
-    'secret_data' => 'encrypted',
-];
-```
-
----
-
-## File Security Principles  
-### Validation:  
-Validate file type, size, and storage location:  
-```php
-$request->validate([
-    'receipt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-]);
-```
-
-### Storage:  
-Store sensitive files privately and serve via controllers:  
-```php
-$path = $request->file('receipt')->store('receipts', 'private');
-```
-
----
-
-## Additional Security Measures  
-### HTTPS Enforcement:  
-Force HTTPS in production:  
-```php
-\URL::forceScheme('https');
-```
-
-### Security Headers:  
-Set headers to enhance security:  
-```php
-$response->headers->set('X-Frame-Options', 'DENY');
-$response->headers->set('X-Content-Type-Options', 'nosniff');
-$response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-```
-
-### Session Timeout:  
-Log out users after inactivity:  
-```php
-'secure' => env('SESSION_SECURE_COOKIE', true),
-'http_only' => true,
-'same_site' => 'lax',
-```
-
----
-
-## References  
-- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)  
-- [Laravel Security Documentation](https://laravel.com/docs/security)  
-- [spatie/laravel-permission](https://github.com/spatie/laravel-permission)  
-- [PHP Security Guide](https://phptherightway.com/#security)  
-
----
-
-Would you like me to apply these changes directly to the README file in your repository? Let me know!
