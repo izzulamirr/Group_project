@@ -27,18 +27,55 @@ This Laravel web application is focused on secure donation transaction collectio
 ## Objective of the Enhancements
 The objective of this website enhancement is to significantly improve its security by implementing comprehensive measures: input validation, authentication and authorization, XSS and CSRF prevention, database security, file security, and additional security measures to address potential vulnerabilities and enhance overall protection.
 
-## Owasp Zap Security report
-Vulnerability Report (OWASP ZAP)
-Automated Scan: OWASP ZAP was run against the application.
-Findings:
-Cookie flags (HttpOnly, Secure, SameSite): ✔️ Set in Laravel config.
-X-Powered-By header: ✔️ Removed in middleware.
-CSP header: ✔️ Set in SecurityHeaders middleware.
-Mixed content or self-signed SSL: ⚠️ May show on localhost, not in production.
-Risk/Confidence:
-No high-risk vulnerabilities found after fixes.
-All findings are low/medium risk with high confidence if not fixed.
+## OWASP ZAP Vulnerability Report
 
+### Automated Scan Results
+
+The following findings were reported by OWASP ZAP after scanning the application:
+
+#### 1. Content Security Policy (CSP)
+- **Description:** CSP header is present, but ensure it is set on all responses and includes the `frame-ancestors` directive to protect against ClickJacking.
+- **Recommendation:** Add or update the CSP header to include `frame-ancestors 'none'` or use the `X-Frame-Options` header.
+
+#### 2. CORS Misconfiguration
+- **Description:** The `Access-Control-Allow-Origin: *` header is set, which allows cross-origin requests from any domain.
+- **Risk:** This could allow third-party sites to access resources in an unintended way.
+- **Recommendation:** Restrict the `Access-Control-Allow-Origin` header to only trusted domains or remove it if not needed.
+
+#### 3. ClickJacking Protection Missing
+- **Description:** The response does not include `X-Frame-Options` or a CSP `frame-ancestors` directive.
+- **Risk:** The site may be vulnerable to clickjacking attacks.
+- **Recommendation:** Set `X-Frame-Options: DENY` or add `frame-ancestors 'none'` to your CSP header.
+
+#### 4. Disclosure of Internal IP Addresses
+- **Description:** Private/internal IP addresses (e.g., `10.1.9.34`, `10.8.1.1`) were found in HTTP responses.
+- **Risk:** Attackers may use this information for further attacks.
+- **Recommendation:** Remove or mask internal IP addresses from all responses.
+
+#### 5. X-Powered-By Header
+- **Description:** The `X-Powered-By` header is present in some responses, revealing server technology.
+- **Recommendation:** Remove the `X-Powered-By` header to reduce information disclosure.
+
+#### 6. Secure Cookie Flags
+- **Description:** Cookies are set with `HttpOnly` and `SameSite` flags, but ensure all cookies also use the `Secure` flag, especially in production.
+
+---
+
+### Summary Table
+
+| Vulnerability                | Risk Level | Recommendation                                 |
+|------------------------------|------------|------------------------------------------------|
+| CSP header issues            | Medium     | Add/strengthen CSP, include frame-ancestors    |
+| CORS misconfiguration        | Medium     | Restrict allowed origins                       |
+| ClickJacking protection      | Medium     | Add X-Frame-Options or frame-ancestors         |
+| Internal IP disclosure       | Low        | Remove/mask internal IPs in responses          |
+| X-Powered-By header          | Low        | Remove header                                  |
+| Cookie flags                 | Low        | Ensure Secure, HttpOnly, SameSite are set      |
+
+---
+
+**No high-risk vulnerabilities were found.**  
+All findings are low/medium risk and can be mitigated with the above recommendations.
 
 ## Web Application Security Enhancements
 
