@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use App\Models\Organization;
 use App\Models\Transaction;
 use App\Models\Donator;
+use App\Models\UserRole;
+use App\Models\RolePermission;
 
 class TransactionController extends Controller
 {
@@ -22,78 +24,103 @@ class TransactionController extends Controller
     {
         $organization = Organization::findOrFail($organization_id);
         $donators = Donator::all();
+
+        $user = auth()->user();
+        $roleIds = UserRole::where('UserID', $user->id)->pluck('RoleID');
+        $hasPermission = RolePermission::whereIn('RoleID', $roleIds)
+            ->where('Description', 'Create Transaction')
+            ->exists();
+
+        if (!$hasPermission) {
+            abort(403, 'Unauthorized action.');
+        }
         return view('transactions.create', compact('organization', 'donators'));
     }
 
     public function edit($organizationId, $transactionId)
-{
-    $organization = Organization::findOrFail($organizationId);
-    $transaction = Transaction::findOrFail($transactionId);
-    $donators = Donator::all(); // or filter by organization if needed
+    {
+        $organization = Organization::findOrFail($organizationId);
+        $transaction = Transaction::findOrFail($transactionId);
 
-    return view('transactions.edit', compact('organization', 'transaction', 'donators'));
-}
+        // Ensure the transaction belongs to the organization
+        if ($transaction->organization_id != $organization->id) {
+            abort(404, 'Transaction not found in this organization.');
+        }
 
-    // Store a new transaction for a specific organization
-    public function store(Request $request, $organization_id)
-{
-    $organization = Organization::findOrFail($organization_id);
+        $user = auth()->user();
+        $roleIds = UserRole::where('UserID', $user->id)->pluck('RoleID');
+        $hasPermission = RolePermission::whereIn('RoleID', $roleIds)
+            ->where('Description', 'Update Transaction')
+            ->exists();
 
-    $request->validate([
-        'donator_name' => 'required|string|max:255',
-        'amount' => 'required|numeric|min:0.01',
-        'remarks' => 'nullable|string',
-        
-    ]);
+        if (!$hasPermission) {
+            abort(403, 'Unauthorized action.');
+        }
 
-    // Create new donator
-    $donator = Donator::create([
-        'Name1' => $request->donator_name,
-        // add other fields if needed
-    ]);
-
-    // Create transaction
-    Transaction::create([
-        'organization_id' => $organization->id,
-        'donator_id' => $donator->id,
-        'amount' => $request->amount,
-        'remarks' => $request->remarks,
-    ]);
-
-    return redirect()->route('organizations.transactions', $organization->id)
-        ->with('flash_message', 'Transaction added!');
-}
-
-    // Update a transaction
-    public function update(Request $request, $organizationId, $transactionId)
-{
-    $request->validate([
-        'donator_id' => 'required|exists:donators,id',
-        'amount' => 'required|numeric|min:0',
-        'remarks' => 'nullable|string|max:255',
-        'receipt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-    ]);
-
-    $transaction = Transaction::findOrFail($transactionId);
-
-    // Handle file upload
-    if ($request->hasFile('receipt')) {
-        $path = $request->file('receipt')->store('receipts', 'public');
-        $transaction->receipt = $path;
+        $donators = Donator::all();
+        return view('transactions.edit', compact('organization', 'transaction', 'donators'));
     }
 
-    $transaction->donator_id = $request->donator_id;
-    $transaction->amount = $request->amount;
-    $transaction->remarks = $request->remarks;
-    $transaction->save();
+    public function update(Request $request, $organizationId, $transactionId)
+    {
+        $organization = Organization::findOrFail($organizationId);
+        $transaction = Transaction::findOrFail($transactionId);
 
-    return redirect()->route('organizations.transactions', $organizationId)
-        ->with('success', 'Transaction updated successfully.');
-}
+        // Ensure the transaction belongs to the organization
+        if ($transaction->organization_id != $organization->id) {
+            abort(404, 'Transaction not found in this organization.');
+        }
 
-    // Delete a transaction
+        $user = auth()->user();
+        $roleIds = UserRole::where('UserID', $user->id)->pluck('RoleID');
+        $hasPermission = RolePermission::whereIn('RoleID', $roleIds)
+            ->where('Description', 'Update Transaction')
+            ->exists();
+
+        if (!$hasPermission) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $request->validate([
+            'donator_id' => 'required|exists:donators,id',
+            'amount' => 'required|numeric|min:0',
+            'remarks' => 'nullable|string|max:255',
+            'receipt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ]);
+
+        if ($request->hasFile('receipt')) {
+            $path = $request->file('receipt')->store('receipts', 'public');
+            $transaction->receipt = $path;
+        }
+
+        $transaction->donator_id = $request->donator_id;
+        $transaction->amount = $request->amount;
+        $transaction->remarks = $request->remarks;
+        $transaction->save();
+
+        return redirect()->route('organizations.transactions', $organizationId)
+            ->with('success', 'Transaction updated successfully.');
+    }
+
     public function destroy($organization_id, Transaction $transaction)
     {
+        $organization = Organization::findOrFail($organization_id);
+
+        // Ensure the transaction belongs to the organization
+        if ($transaction->organization_id != $organization->id) {
+            abort(404, 'Transaction not found in this organization.');
+        }
+
+        $user = auth()->user();
+        $roleIds = UserRole::where('UserID', $user->id)->pluck('RoleID');
+        $hasPermission = RolePermission::whereIn('RoleID', $roleIds)
+            ->where('Description', 'Delete Transaction')
+            ->exists();
+
+        if (!$hasPermission) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $transaction->delete();
         return redirect()->route('organizations.transactions', $organization_id)
             ->with('flash_message', 'Transaction deleted!');
