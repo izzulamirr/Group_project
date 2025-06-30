@@ -3,7 +3,7 @@
 ## Group Member
 |Member                      |Matric ID| Assigned Tasks
 |----------------------------|---------|---------
-|Izzul Amir Bin Zulkifly     |2118091  | Regex application, input validation, authentication of admin login, application of session and timeout, authorization for admin access, password hashing
+|Izzul Amir Bin Zulkifly     |2118091  | Authorization, File Security Principles, Database Security Principles, XSS and CSRF Prevention
 
 
 # Table of Contents
