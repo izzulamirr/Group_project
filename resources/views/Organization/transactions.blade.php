@@ -22,7 +22,8 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Donator</th>
+                <th>ID</th>
+                <th>Donator's Name</th>
                 <th>Amount</th>
                 <th>Remarks</th>
                 <th>Donation Date</th>
@@ -33,6 +34,7 @@
         <tbody>
            @foreach($transactions as $transaction)
             <tr>
+                <td>{{ $transaction->id }}</td>
                 <td>{{ $transaction->donator->Name1 ?? '-' }}</td>
                 <td>{{ $transaction->amount }}</td>
                 <td>{{ $transaction->remarks }}</td>

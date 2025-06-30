@@ -8,15 +8,8 @@
         @csrf
         @method('PUT')
         <div class="mb-3">
-            <label>Donator</label>
-            <select name="donator_id" class="form-control" required>
-                <option value="">Select Donator</option>
-                @foreach($donators as $donator)
-                    <option value="{{ $donator->id }}" {{ $transaction->donator_id == $donator->id ? 'selected' : '' }}>
-                        {{ $donator->Name1 ?? $donator->name }}
-                    </option>
-                @endforeach
-            </select>
+            <label>Donator Name</label>
+            <input type="text" name="Name1" class="form-control" value="{{ $transaction->donator->Name1 ?? $transaction->donator->name }}" required>
         </div>
         <div class="mb-3">
             <label>Amount</label>
