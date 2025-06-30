@@ -1,27 +1,28 @@
-Ethical Shield Report
-INFO 4345 | GroupProject
+# Group Project Report
+# INFO 4345 | Ethical Shield
 
 
-Table of Contents
-Vulnerability Report (OWASP ZAP)
-Input Validation
-Authentication
-Authorization
-XSS Prevention
-CSRF Prevention
-Database Security Principles
-File Security Principles
-Additional Security Measures
-Brief Description
+# Table of Contents
+# Vulnerability Report (OWASP ZAP)
+# Input Validation
+# Authentication
+# Authorization
+# XSS Prevention
+# CSRF Prevention
+# Database Security Principles
+# File Security Principles
+# Additional Security Measures
+
+## Brief Description
 
 This Laravel web application is focused on secure donation transaction collection, ensuring that each registered user can only manage and access their own organization.
 
 
-Objective of the Enhancements
+## Objective of the Enhancements
 The objective of this website enhancement is to significantly improve its security by implementing comprehensive measures: input validation, authentication and authorization, XSS and CSRF prevention, database security, file security, and additional security measures to address potential vulnerabilities and enhance overall protection.
 
-Web Application Security Enhancements
-1. Vulnerability Report (OWASP ZAP)
+## Owasp Zap Security report
+Vulnerability Report (OWASP ZAP)
 Automated Scan: OWASP ZAP was run against the application.
 Findings:
 Cookie flags (HttpOnly, Secure, SameSite): ✔️ Set in Laravel config.
@@ -32,14 +33,18 @@ Risk/Confidence:
 No high-risk vulnerabilities found after fixes.
 All findings are low/medium risk with high confidence if not fixed.
 
-2. Input Validation
+
+## Web Application Security Enhancements
+
+
+### Input Validation
 Client-side:
 **Registration Form Example** 
  
 HTML5 validation (required, type, minlength, maxlength, pattern) in forms.
 Server-side:
 
-3. Authentication
+### Authentication
 Password Storage:
 Laravel uses bcrypt (strong, salted, one-way hashing).
 
@@ -54,7 +59,7 @@ Session IDs are strong, regenerated on login, invalidated on logout.
 ```php
 'secure' => env('SESSION_SECURE_COOKIE', true),
 'http_only' => true,
-'same_site' => 'lax',
+'same_site' => 'strict',
 ```
 Cookies are HttpOnly, Secure, SameSite.
 
@@ -73,12 +78,12 @@ Example:
 ],
 ```
 
-5. Authorization
+### Authorization
 
 Vertical (Role-Based):
-The application uses a custom middleware called Checkpermission to enforce role-based access control.
-This middleware checks the current user's roles (from the UserRole model) and verifies if the user has permission to access the requested route by checking the RolePermission model.
-If the user does not have the required permission for the route, a 403 Forbidden response is returned, preventing unauthorized access to protected resources.
+- The application uses a custom middleware called Checkpermission to enforce role-based access control.
+- This middleware checks the current user's roles (from the UserRole model) and verifies if the user has permission to access the requested route by checking the RolePermission model.
+- If the user does not have the required permission for the route, a 403 Forbidden response is returned, preventing unauthorized access to protected resources.
 Middleware Example:
 **app\Http\Middleware\Checkpermission.php**
 ```php
@@ -100,7 +105,7 @@ public function handle(Request $request, Closure $next): Response
     return $next($request);
 }
 ```
-How it is applied:
+- How it is applied:
 The Checkpermission middleware is registered in Kernel.php and applied to routes or route groups that require role-based access control.
 Example route usage:
 
@@ -111,7 +116,7 @@ Route::middleware(['auth', 'checkpermission'])->group(function () {
 });
 ```
 
-Horizontal (User Data):
+- Horizontal (User Data):
 In addition to role checks, controllers verify that users can only access or modify their own data, ensuring user-specific data protection.
 **app/Http/Controllers/TransactionController.php**
 ```php 
@@ -128,8 +133,8 @@ public function show($id)
 }
 ```
 
-5. XSS Prevention
-Blade Escaping:
+### XSS Prevention
+- Blade Escaping:
 **resources\views\admin\CreateUser.blade.php**
 ```php
  <div class="mb-3">
@@ -151,7 +156,7 @@ Blade Escaping:
         </div>
 ```
 
-CSP header set in middleware.
+- CSP header set in middleware.
 **app/Http/Middleware/SecurityHeaders.php**
 ```php
 public function handle($request, Closure $next)
@@ -162,7 +167,7 @@ public function handle($request, Closure $next)
 }
 ```
 
-6. CSRF Prevention
+### CSRF Prevention
 Blade Form Token:
 Laravel automatically validates CSRF tokens on POST/PUT/DELETE requests.
 **resources\views\profile\edit.blade.php**
@@ -190,7 +195,7 @@ Laravel automatically validates CSRF tokens on POST/PUT/DELETE requests.
     </form>
 ```
 
-7. Database Security Principles
+### Database Security Principles
 Eloquent ORM (Prevents SQL Injection):
 ```php
 $user = User::where('email', $email)->first();
@@ -207,7 +212,7 @@ DB_USERNAME=groupproject_user
 DB_PASSWORD=Test123455
 ```
 
-8. File Security Principles
+### File Security Principles
 File Upload Validation and Storage:
 **// app/Http/Controllers/TransactionController.php**
 ```php
@@ -229,7 +234,7 @@ if ($request->hasFile('receipt')) {
 ```
 
 
-9. Additional Security Measures
+### Additional Security Measures
 HTTPS enforced in production:
 **app/Providers/AppServiceProvider.php**
 ```php
@@ -272,16 +277,16 @@ public function handle($request, Closure $next)
 }
 ```
 
-References
-OWASP Top Ten
-Laravel Security Docs
-spatie/laravel-permission
-PHP Security Guide
+## References
+1. OWASP Top Ten
+2. Laravel Security Docs
+3. PHP Security Guide
+
 Appendices
 Live site: [your live site URL]
+
 Weekly Progress Report: [your progress report link]
-Your system demonstrates strong security and meets nearly all rubric requirements.
-Apply the above enhancements for full marks and best-practice compliance.
+
 
 
 
