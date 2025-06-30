@@ -1,3 +1,4 @@
+
 @extends('layouts.layout')
 @section('content')
 <div class="container py-4">
@@ -5,7 +6,7 @@
     <!-- Card for Organization List -->
     <div class="card shadow-lg border-0 rounded-4">
         <div class="card-header bg-primary text-white rounded-top-4 fs-5 fw-bold">
-            <i class="fa-solid fa-list me-2"></i>List of Organizations
+            List of Organizations
         </div>
         <div class="card-body">
             @if (session('flash_message'))
@@ -27,8 +28,8 @@
             @endphp
 
             @if($canCreate)
-            <a href="{{ route('organizations.create') }}" class="btn btn-success mb-3 rounded-pill px-4 py-2" title="Add new Organization">
-                <i class="fa-solid fa-plus me-1"></i> Add Organization
+            <a href="{{ route('organizations.create') }}" class="btn btn-success btn-lg mb-3 rounded-pill px-4 py-2" title="Add new Organization">
+                Add Organization
             </a>
             @endif
 
@@ -49,21 +50,21 @@
                             <td class="fw-semibold">{{ $organization->name }}</td>
                             <td>{{ $organization->remarks ?? '-' }}</td>
                             <td class="text-center">
-                                <a href="{{ route('organizations.transactions', $organization->id) }}" class="btn btn-info btn-sm rounded-pill mb-1">
-                                    <i class="fa-solid fa-eye me-1"></i> View Transactions
+                                <a href="{{ route('organizations.transactions', $organization->id) }}" class="btn btn-info mb-1">
+                                    View Transactions
                                 </a>
                                 @if($canEdit)
-                                <a href="{{ route('organizations.edit', $organization->id) }}" class="btn btn-primary btn-sm rounded-pill mb-1">
-                                    <i class="fa-solid fa-pen-to-square me-1"></i> Edit
+                                <a href="{{ route('organizations.edit', $organization->id) }}" class="btn btn-primary mb-1">
+                                    Edit
                                 </a>
                                 @endif
                                 @if($canDelete)
                                 <form method="POST" action="{{ route('organizations.destroy', $organization->id) }}" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill mb-1"
+                                    <button type="submit" class="btn btn-danger mb-1"
                                         onclick="return confirm('Are you sure?')">
-                                        <i class="fa-solid fa-trash me-1"></i> Delete
+                                        Delete
                                     </button>
                                 </form>
                                 @endif

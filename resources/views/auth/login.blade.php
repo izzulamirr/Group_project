@@ -1,11 +1,11 @@
 @extends('layouts.auth')
 
 @section('content')
-<div class="login-center" style="min-height:100vh;display:flex;justify-content:center;align-items:center;">
-    <div class="card p-4 shadow" style="min-width:350px;max-width:400px;width:100%;">
+<div class="login-center">
+    <div class="card login-card">
         <div class="text-center mb-4">
-            <img src="{{ asset('images/logo.png') }}" alt="Smart Fund" style="width:64px;height:64px;">
-            <h2 class="mt-2 mb-0" style="font-weight:700;">Login</h2>
+            <img src="{{ asset('images/logo.png') }}" alt="Smart Fund" class="login-logo">
+            <h2 class="login-title mt-2 mb-0">Login</h2>
         </div>
 
         @if ($errors->any())
@@ -34,16 +34,6 @@
                 <label for="password" class="form-label">Password</label>
                 <input id="password" class="form-control" type="password" name="password" required autocomplete="current-password">
             </div>
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="remember_me" name="remember">
-                <label class="form-check-label" for="remember_me">Remember me</label>
-            </div>
-            <div class="d-flex justify-content-between align-items-center">
-                @if (Route::has('password.request'))
-                    <a class="small" href="{{ route('password.request') }}">
-                        Forgot your password?
-                    </a>
-                @endif
                 <button type="submit" class="btn btn-primary px-4">Log in</button>
             </div>
         </form>

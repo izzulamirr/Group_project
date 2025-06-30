@@ -8,8 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <!-- Script -->
@@ -17,7 +16,7 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg main-navbar">
+   <nav class="navbar navbar-expand-lg main-navbar">
     <div class="container">
         <a class="navbar-brand d-flex align-items-center" href="#">
             <img src="{{ asset('images/logo.png') }}" class="me-2" width="40" height="40" alt="Smart Fund">
@@ -30,26 +29,25 @@
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
             <ul class="navbar-nav align-items-center">
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('Orgdashboard') ? 'active' : '' }}" href="{{ route('Orgdashboard') }}">
-                        <i class="fa-solid fa-house me-1"></i> Dashboard Home
+                    <a class="nav-link nav-big-btn {{ request()->routeIs('Orgdashboard') ? 'active' : '' }}" href="{{ route('Orgdashboard') }}">
+                        Dashboard Home
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('organizations.my') ? 'active' : '' }}" href="{{ route('organizations.my') }}">
-                        <i class="fa-solid fa-building-columns me-1"></i> Fund Dashboard
+                    <a class="nav-link nav-big-btn {{ request()->routeIs('organizations.my') ? 'active' : '' }}" href="{{ route('organizations.my') }}">
+                        Fund Dashboard
                     </a>
                 </li>
                 <!-- User Icon and Name -->
                 @auth
                 <li class="nav-item dropdown ms-3">
                     <a class="nav-link dropdown-toggle d-flex align-items-center text-decoration-none" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-solid fa-user-circle fa-lg me-2 text-primary"></i>
                         <span class="fw-semibold text-dark">{{ Auth::user()->name }}</span>
                     </a>
                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                     <li>
                         <a class="dropdown-item" href="{{ route('profile.show') }}">
-                            <i class="fa-solid fa-user-gear me-2"></i> Profile
+                            Profile
                         </a>
                     </li>
                     
@@ -59,14 +57,14 @@
                         @if($role && $role->RoleID == 1)
                         <li>
                             <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
-                                <i class="fa-solid fa-gauge me-2"></i> Admin Dashboard
+                                Admin Dashboard
                             </a>
                         </li>
                         @endif
                         <li><hr class="dropdown-divider"></li>
                         <li>
                            <a class="dropdown-item text-danger" href="#" id="logout-link">
-                            <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                            Logout
                            </a>
                         </li>
                     </ul>
@@ -75,13 +73,13 @@
             </ul>
         </div>
     </div>
-    </nav>
-    <!-- Back Button just below the navbar -->
-    <div class="container mt-3">
-        <a href="{{ url()->previous() }}" class="btn btn-secondary">
-            <i class="fa-solid fa-arrow-left me-1"></i> Back
-        </a>
-    </div>
+</nav>
+<!-- Back Button just below the navbar -->
+<div class="container mt-3">
+    <a href="{{ url()->previous() }}" class="btn btn-secondary btn-lg">
+        Back
+    </a>
+</div>
 
     <!-- Main Content -->
     <div class="container main-content">
@@ -98,11 +96,11 @@
     <!-- Font Awesome -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
 
-    <!-- Hidden logout form (only one per page) -->
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-        @csrf
-    </form>
-    @yield('scripts')
+   <!-- Hidden logout form (only one per page) -->
+<form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+    @csrf
+</form>
+@yield('scripts')
 
 </body>
 </html>

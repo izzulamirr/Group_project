@@ -10,11 +10,19 @@ use App\Models\RolePermission;
 
 class OrganizationController extends Controller
 {
+    public function dashboard()
+    {
+        $organizationCount = Organization::where('user_id', auth()->id())->count();
+        return view('Organization.dashboard', compact('organizationCount'));
+    }
     // List all organizations (for donation listing)
     public function index()
     {
+     
         $organizations = Organization::where('user_id', auth()->id())->get();
         return view('organization.mylist', compact('organizations'));
+
+
     }
 
     public function transactions($id)

@@ -21,9 +21,7 @@ Route::get('/home', function () {
     return view('transactions.homepage');
 })->name('dashhome');
 
-Route::get('/dashboard', function () {
-    return view('Organization.dashboard');
-})->name('Orgdashboard');
+Route::get('/dashboard', [OrganizationController::class, 'dashboard'])->name('Orgdashboard');
 
 Route::get('/thank', function () {
     return view('transactions.thank');

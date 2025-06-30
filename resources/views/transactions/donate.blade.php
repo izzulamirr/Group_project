@@ -1,79 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Donation Form</title>
-<!-- Bootstrap 5 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
-<!-- Font Awesome -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-<style>
-    body {
-        font-family: 'Montserrat', Arial, sans-serif;
-        background: #f8fafc;
-    }
-    .donation-card {
-        background: #fff;
-        border-radius: 18px;
-        box-shadow: 0 4px 24px rgba(13, 202, 240, 0.08);
-        padding: 2rem 2.5rem;
-        margin-top: 3rem;
-        margin-bottom: 3rem;
-        max-width: 700px;
-    }
-    .form-label {
-        font-weight: 600;
-        color: #0d6efd;
-    }
-    .btn-green {
-        background: linear-gradient(90deg, #198754 0%, #20c997 100%);
-        color: #fff;
-        border: none;
-        border-radius: 20px;
-        font-weight: 600;
-        transition: background 0.2s;
-    }
-    .btn-green:hover {
-        background: linear-gradient(90deg, #157347 0%, #198754 100%);
-        color: #fff;
-    }
-    .btn-yellow {
-        background: linear-gradient(90deg, #ffc107 0%, #ffecb3 100%);
-        color: #212529;
-        border: none;
-        border-radius: 20px;
-        font-weight: 600;
-        transition: background 0.2s;
-    }
-    .btn-yellow:hover {
-        background: linear-gradient(90deg, #ffb300 0%, #ffe082 100%);
-        color: #212529;
-    }
-    .table th, .table td {
-        vertical-align: middle;
-        text-align: center;
-    }
-    .remove-row {
-        border-radius: 50%;
-        font-size: 1.2rem;
-        padding: 0.25rem 0.6rem;
-    }
-    .recipient-details {
-        font-size: 0.95em;
-        color: #555;
-        margin-top: 0.25rem;
-        text-align: left;
-    }
-</style>
-</head>
-<body>
+@extends('layouts.donate')
 
+@section('title', 'Donation Form')
+
+@section('content')
 <div class="container d-flex justify-content-center align-items-center min-vh-100">
     <div class="donation-card w-100">
-        <h2 class="mb-4 text-center fw-bold text-primary"><i class="fa-solid fa-hand-holding-heart me-2"></i>Donation Form</h2>
+       <h2 class="mb-4 text-center fw-bold text-primary">
+    Donation Form
+</h2>
         <form id="donationForm" action="{{ route('transaction.donate.submit') }}" method="POST">
             @csrf
             <div class="mb-3">
@@ -129,11 +63,9 @@
         </form>
     </div>
 </div>
+@endsection
 
-<!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Font Awesome -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+@section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let rowIdx = 1;
@@ -142,9 +74,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Prepare details for each organization
     const orgDetails = {};
     recipients.forEach(function(org) {
-        orgDetails[org.id] = `<strong>${org.name}</strong>
-            ${org.address ? '<br><span>' + org.address + '</span>' : ''}
-            ${org.description ? '<br><span>' + org.description + '</span>' : ''}`;
+        orgDetails[org.id] = `<strong>${org.name}</strong>`
+            + (org.address ? '<br><span>' + org.address + '</span>' : '')
+            + (org.description ? '<br><span>' + org.description + '</span>' : '');
     });
 
     // Show details for the first row if selected
@@ -206,6 +138,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-
-</body>
-</html>
+@endsection

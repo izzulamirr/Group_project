@@ -2,7 +2,7 @@
 @section('content')
 <div class="container mt-5" style="max-width: 700px;">
     <h2 class="mb-4 fw-bold text-primary">
-        <i class="fa-solid fa-user-circle me-2"></i>Profile Settings
+        <i class=""></i>Profile Settings
     </h2>
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>

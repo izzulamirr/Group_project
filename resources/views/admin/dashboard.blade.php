@@ -10,13 +10,13 @@
 
     <div class="mb-3">
         <a href="{{ route('admin.user.create') }}" class="btn btn-success">
-            <i class="fa fa-user-plus me-1"></i> Add User
+            Add User
         </a>
     </div>
 
     <div class="card shadow-lg border-0 rounded-4">
         <div class="card-header bg-dark text-white rounded-top-4 fs-5 fw-bold">
-            <i class="fa-solid fa-gauge me-2"></i>Admin Dashboard
+            Admin Dashboard
         </div>
         <div class="card-body">
             <h5 class="mb-4">All Users, Organizations & Transactions</h5>
@@ -62,13 +62,13 @@
                             </td>
                             <td>
                                 <a href="{{ route('admin.user.permissions', $user->id) }}" class="btn btn-warning btn-sm">
-                                    <i class="fa-solid fa-user-shield me-1"></i> Manage Permissions
+                                    Manage Permissions
                                 </a>
                                 <form action="{{ route('admin.user.delete', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm">
-                                        <i class="fa fa-trash me-1"></i> Delete
+                                        Delete
                                     </button>
                                 </form>
                             </td>

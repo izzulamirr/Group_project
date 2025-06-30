@@ -1,11 +1,11 @@
 @extends('layouts.auth')
 
 @section('content')
-<div class="login-center" style="min-height:100vh;display:flex;justify-content:center;align-items:center;">
-    <div class="card p-4 shadow" style="min-width:350px;max-width:400px;width:100%;">
+<div class="register-center">
+    <div class="card register-card">
         <div class="text-center mb-4">
-            <img src="{{ asset('images/logo.png') }}" alt="Smart Fund" style="width:64px;height:64px;">
-            <h2 class="mt-2 mb-0" style="font-weight:700;">Register</h2>
+            <img src="{{ asset('images/logo.png') }}" alt="Smart Fund" class="register-logo">
+            <h2 class="register-title mt-2 mb-0">Register</h2>
         </div>
 
         @if ($errors->any())
