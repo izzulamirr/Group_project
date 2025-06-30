@@ -3,7 +3,9 @@
 ## Group Member
 |Member                      |Matric ID| Assigned Tasks
 |----------------------------|---------|---------
-|Izzul Amir Bin Zulkifly     |2118091  | Authorization, File Security Principles, Database Security Principles, XSS and CSRF Prevention
+|Izzul Amir Bin Zulkifly     |2118091  | Authorization, File Security Principles, Database Security Principles, XSS and CSRF Prevention|
+| Haziq Uzair| 21xxx| xxx|
+|Johan Adam | 21xxxx| xxx|
 
 
 # Table of Contents
