@@ -287,7 +287,7 @@ public function handle($request, Closure $next)
 3. PHP Security Guide
 
 Appendices
-Live site: [your live site URL]
+
 
 Weekly Progress Report: [your progress report link]
 
