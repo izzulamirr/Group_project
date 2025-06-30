@@ -149,11 +149,88 @@ All findings are low/medium risk and can be mitigated with the above recommendat
 
 - **Horizontal (User Data):**  
   Controllers verify that users can only access or modify their own data, ensuring user-specific data protection.
+  **Example: OrganizationController.php**
+  ```php
+  // Only allow the owner or a user with permission to update
+  public function update(Request $request, $id)
+  {
+      $organization = Organization::findOrFail($id);
+      $user = auth()->user();
+      $roleIds = UserRole::where('UserID', $user->id)->pluck('RoleID');
+      $hasPermission = RolePermission::whereIn('RoleID', $roleIds)
+          ->where('Description', 'Update Organization')
+          ->exists();
+
+      // Only allow if user is owner or has permission
+      if ($organization->user_id !== $user->id && !$hasPermission) {
+          abort(403, 'Unauthorized action.');
+      }
+
+      $request->validate([
+          'name' => 'required|string|max:255',
+          'remarks' => 'nullable|string|max:255',
+      ]);
+      $organization->update([
+          'name' => $request->name,
+          'remarks' => $request->remarks,
+      ]);
+      return redirect()->route('organizations.my')->with('flash_message', 'Organization Updated!');
+  }
+  ```
+
+  **Example: TransactionController.php**
+  ```php
+  // Ensure the transaction belongs to the organization and user has permission
+  public function edit($organizationId, $transactionId)
+  {
+      $organization = Organization::findOrFail($organizationId);
+      $transaction = Transaction::findOrFail($transactionId);
+
+      // Ensure the transaction belongs to the organization
+      if ($transaction->organization_id != $organization->id) {
+          abort(404, 'Transaction not found in this organization.');
+      }
+
+      $user = auth()->user();
+      $roleIds = UserRole::where('UserID', $user->id)->pluck('RoleID');
+      $hasPermission = RolePermission::whereIn('RoleID', $roleIds)
+          ->where('Description', 'Update Transaction')
+          ->exists();
+
+      if (!$hasPermission) {
+          abort(403, 'Unauthorized action.');
+      }
+
+      $donators = Donator::all();
+      return view('transactions.edit', compact('organization', 'transaction', 'donators'));
+  }
+  ```
+
+  **Example: Route Protection**
+  ```php
+  // routes/web.php
+  Route::middleware(['auth', 'checkpermission'])->group(function () {
+      Route::get('/organization/create', [OrganizationController::class, 'create'])->name('organization.create');
+      Route::post('/organization', [OrganizationController::class, 'store'])->name('organization.store');
+      // ...other protected routes
+  });
+  ```
 
 ### XSS Prevention
 
 - **Blade Escaping:**  
   All output in Blade templates uses `{{ }}` for automatic escaping.
+    **Example: resources/views/organization/create.blade.php**
+  ```php
+  <div class="mb-3">
+      <label for="name" class="form-label">Organization Name</label>
+      <input id="name" type="text" class="form-control @error('name') is-invalid @enderror"
+             name="name" value="{{ old('name') }}" required autofocus>
+      @error('name')
+          <span class="invalid-feedback">{{ $message }}</span>
+      @enderror
+  </div>
+  ```
 
 - **CSP header set in middleware:**  
   ```php
@@ -171,9 +248,26 @@ All findings are low/medium risk and can be mitigated with the above recommendat
   Laravel automatically validates CSRF tokens on POST/PUT/DELETE requests.
   ```php
   <form action="{{ route('profile.update') }}" method="POST">
-      @csrf
-      <!-- form fields -->
-  </form>
+        @csrf
+
+        <div class="mb-3">
+            <label>Name</label>
+            <input type="text" name="name" class="form-control" value="{{ old('name', $user->name) }}" required>
+        </div>
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}" required>
+        </div>
+        <div class="mb-3">
+            <label>New Password <small class="text-muted">(leave blank to keep current password)</small></label>
+            <input type="password" name="password" class="form-control" autocomplete="new-password">
+        </div>
+        <div class="mb-3">
+            <label>Confirm New Password</label>
+            <input type="password" name="password_confirmation" class="form-control" autocomplete="new-password">
+        </div>
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+    </form>
   ```
 
 ### Database Security Principles
@@ -184,7 +278,17 @@ All findings are low/medium risk and can be mitigated with the above recommendat
   ```
 
 - **Database user has least privilege:**  
-  The database user does not have DROP/ALTER rights.
+  The database user does not have DROP/ALTER rights.  
+  Example from `.env`:
+  ```env
+  DB_CONNECTION=mysql
+  DB_HOST=127.0.0.1
+  DB_PORT=3306
+  DB_DATABASE=GroupProject
+  DB_USERNAME=groupproject_user
+  DB_PASSWORD=Test123455
+  ```
+  The `groupproject_user` account is configured in MySQL with only the necessary privileges (SELECT, INSERT, UPDATE, DELETE) and **does not have DROP or ALTER permissions**. This limits the potential damage if the credentials are ever compromised.
 
 ### File Security Principles
 
