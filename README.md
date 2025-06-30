@@ -1,5 +1,9 @@
 # Group Project Report
 # INFO 4345 | Ethical Shield
+## Group Member
+|Member                      |Matric ID| Assigned Tasks
+|----------------------------|---------|---------
+|Izzul Amir Bin Zulkifly     |2118091  | Regex application, input validation, authentication of admin login, application of session and timeout, authorization for admin access, password hashing
 
 
 # Table of Contents
