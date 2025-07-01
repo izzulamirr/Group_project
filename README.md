@@ -195,8 +195,7 @@ regex:/^[A-Za-z\s]+$/ ensures the name contains only letters and spaces.
 - **Password Storage:**  
   Laravel uses bcrypt (strong, salted, one-way hashing).
     **RegistrationController**
-
-  ```php 
+```php
 public function register(Request $request)
 {
     $user = User::create([
@@ -204,8 +203,9 @@ public function register(Request $request)
         'email' => $request->email,
         'password' => Hash::make($request->password), // <--- bcrypt is used here
     ]);
-    // ...
 }
+```
+
 
 
 
