@@ -6,7 +6,7 @@
 |-----------------------------|-----------|-------------------------------------------------------------------|
 | Izzul Amir Bin Zulkifly     | 2118091   | Authorization, File Security Principles, Database Security Principles, XSS and CSRF Prevention |
 | Haziq Uzair                 | 21xxx     | xxx                                                               |
-| Johan Adam                  | 2116387   | Input Validation, Add Regex, Login and Register Request File |
+| Johan Adam                  | 2116387   | Input Validation, Add Regex, Login and Register Request File, Profile Page |
 
 ---
 
