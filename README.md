@@ -194,9 +194,43 @@ regex:/^[A-Za-z\s]+$/ ensures the name contains only letters and spaces.
 
 - **Password Storage:**  
   Laravel uses bcrypt (strong, salted, one-way hashing).
+    **RegistrationController**
+
+  ```php 
+public function register(Request $request)
+{
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password), // <--- bcrypt is used here
+    ]);
+    // ...
+}
+
+
+
 
 - **Password Policies:**  
   Enforced via validation rules (min length, complexity recommended).
+    **RegisterRequest**
+```php
+'password.regex' => 'The password must be at least 7 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.',
+```
+
+**Ratelimiting**
+- The login attempts to 3 failure per 2 minutes
+**LoginController**
+```php
+if (RateLimiter::tooManyAttempts($key, 3)) {
+    $seconds = RateLimiter::availableIn($key);
+    return back()->withErrors([
+        'email' => "Too many login attempts. Please try again in $seconds seconds."
+    ]);
+}
+// ...
+RateLimiter::hit($key, 120);
+```
+
 
 - **Session Management:**  
   Session IDs are strong, regenerated on login, invalidated on logout.
@@ -209,6 +243,15 @@ regex:/^[A-Za-z\s]+$/ ensures the name contains only letters and spaces.
 
 - **Multi-Factor Authentication:**  
   TOTP 2FA enabled via Laravel Fortify. Can be enforced for admins/high-privilege users.
+  **fortify.php**
+ ```php
+'features' => [
+    Features::twoFactorAuthentication([
+        'confirmPassword' => true,
+    ]),
+],
+```
+  
 
 ### Authorization
 
@@ -447,4 +490,4 @@ regex:/^[A-Za-z\s]+$/ ensures the name contains only letters and spaces.
 
 ## Appendices
 
-- Weekly Progress Report: [your progress report link]
+- Weekly Progress Report: 

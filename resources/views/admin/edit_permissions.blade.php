@@ -3,7 +3,7 @@
 <div class="container py-4">
     <div class="card">
         <div class="card-header bg-warning text-dark fw-bold">
-            <i class="fa-solid fa-user-shield me-2"></i>Manage Permissions for {{ $user->name }}
+        Manage Permissions for {{ $user->name }}
         </div>
         <div class="card-body">
             <form method="POST" action="{{ route('admin.user.permissions.update', $user->id) }}">

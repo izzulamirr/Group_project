@@ -79,7 +79,7 @@ Route::get('/organizations', [OrganizationController::class, 'index'])->name('or
 Route::get('/organizations/{organization}/transactions', [OrganizationController::class, 'transactions'])->name('organizations.transactions');
 
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('login', [LoginController::class, 'login']);
+Route::post('login', [LoginController::class, 'login'])->name('login');
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 Route::post('register', [RegistrationController::class, 'register'])->name('register');
 
