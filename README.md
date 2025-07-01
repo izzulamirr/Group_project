@@ -520,9 +520,26 @@ RateLimiter::hit($key, 120);
 
 ## References
 
-1. OWASP Top Ten
-2. Laravel Security Docs
-3. PHP Security Guide
+1. OWASP Top Ten  
+   https://owasp.org/www-project-top-ten/
+2. Laravel Security Docs  
+   https://laravel.com/docs/10.x/security
+3. PHP Security Guide  
+   https://www.php.net/manual/en/security.php
+4. OWASP Cheat Sheet Series  
+   https://cheatsheetseries.owasp.org/
+5. Mozilla Web Security Guidelines  
+   https://infosec.mozilla.org/guidelines/web_security
+6. NIST Digital Identity Guidelines  
+   https://pages.nist.gov/800-63-3/
+7. Laravel Fortify Documentation  
+   https://laravel.com/docs/10.x/fortify
+8. Laravel Validation Documentation  
+   https://laravel.com/docs/10.x/validation
+9. Laravel Middleware Documentation  
+   https://laravel.com/docs/10.x/middleware
+10. OWASP Secure Headers Project  
+    https://owasp.org/www-project-secure-headers/
 
 ---
 
