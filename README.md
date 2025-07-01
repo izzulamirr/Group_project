@@ -6,7 +6,7 @@
 |-----------------------------|-----------|-------------------------------------------------------------------|
 | Izzul Amir Bin Zulkifly     | 2118091   | Authorization, File Security Principles, Database Security Principles, XSS and CSRF Prevention |
 | Haziq Uzair                 | 21xxx     | xxx                                                               |
-| Johan Adam                  | 21xxxx    | xxx                                                               |
+| Johan Adam                  | 2116387   | Input Validation, Add Regex, Login and Register Request File |
 
 ---
 
@@ -90,12 +90,90 @@ All findings are low/medium risk and can be mitigated with the above recommendat
 ## Web Application Security Enhancements
 
 ### Input Validation
+Input validation ensures that user-provided data meets specific criteria before being processed or stored.
+Laravel provides robust validation features, including custom rules, regex patterns, and error messages.|
 
-- **Client-side:**  
-  HTML5 validation (required, type, minlength, maxlength, pattern) in forms.
+- **Regex Validation:**  
+- Regex validation is used to enforce specific patterns for input fields. For example, ensuring that a name contains only letters (A-Z and a-z).
 
-- **Server-side:**  
-  Laravel validation rules in controllers (e.g., `'name' => 'required|string|max:255'`).
+**Regex Example:**
+   ```php
+   public function rules(): array
+  {
+    return [
+        'name' => 'required|regex:/^[A-Za-z\s]+$/|max:255', // Only letters and spaces allowed
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:8|confirmed',
+    ];
+  }
+
+   public function messages(): array
+  {
+    return [
+        'name.regex' => 'The name may only contain letters and spaces.',
+    ];
+  }
+  ```
+**Explanation:**
+- Regex Rule: regex:/^[A-Za-z\s]+$/ ensures the name contains only letters and spaces.
+
+- **Registration Request:**
+- The RegistrationRequest class handles validation for user registration.
+
+**Controller Logic For Register Request:**
+   ```php
+   public function registerWithEmail(RegistrationRequest $request)
+  {
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'roles' => '0',
+    ]);
+
+    Auth::login($user);
+    $request->session()->regenerate();
+
+    return redirect()->route('thome');
+  }
+  ```
+
+- **LoginRequest:**
+- The LoginRequest class handles validation for login functionality..
+
+**LoginRequest.php:**
+   ```php
+   public function rules(): array
+  {
+    return [
+        'email' => 'required|email', // Validate email format
+        'password' => 'required|string',
+    ];
+  }
+  ```
+**Controller Logic For Login:**
+   ```php
+   public function loginWithEmail(LoginRequest $request)
+{
+    $credentials = $request->only('email', 'password');
+
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+
+        $user = Auth::user();
+
+        if ($user->roles == '1') {
+            return redirect()->route('transaction.index');
+        } else {
+            return redirect()->route('thome');
+        }
+    }
+
+    return back()->withErrors([
+        'email' => 'The provided credentials do not match our records.',
+    ]);
+}
+  ```
 
 ### Authentication
 
