@@ -528,4 +528,4 @@ RateLimiter::hit($key, 120);
 
 ## Appendices
 
-- Weekly Progress Report: 
+- Weekly Progress Report: https://docs.google.com/document/d/1qwqaLLpAXe4KyqEuUIXx8ieUb1exlm-_XbjHeXsBjFY/edit?usp=sharing
