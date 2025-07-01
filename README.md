@@ -103,39 +103,53 @@ Laravel provides robust validation features, including custom rules, regex patte
     return [
         'name' => 'required|regex:/^[A-Za-z\s]+$/|max:255', // Only letters and spaces allowed
         'email' => 'required|email|unique:users,email',
-        'password' => 'required|string|min:8|confirmed',
-    ];
+        'password' => 'required|string|min:7|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/',
+        ];
+    
   }
 
    public function messages(): array
   {
     return [
         'name.regex' => 'The name may only contain letters and spaces.',
+        'password.regex' => 'The password must be at least 7 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.',
     ];
   }
   ```
 **Explanation:**
-- Regex Rule: regex:/^[A-Za-z\s]+$/ ensures the name contains only letters and spaces.
+- Regex Rule: 
+regex:/^[A-Za-z\s]+$/ ensures the name contains only letters and spaces.
+  This regex enforces a strong password policy by requiring:
+  - At least 7 characters in total
+  - At least one uppercase letter (A-Z)
+  - At least one lowercase letter (a-z)
+  - At least one digit (0-9)
+  - At least one special character (such as @, $, !, %, *, ?, &)
 
 - **Registration Request:**
 - The RegistrationRequest class handles validation for user registration.
 
 **Controller Logic For Register Request:**
    ```php
-   public function registerWithEmail(RegistrationRequest $request)
+   public function register(RegistrationRequest $request)
   {
     $user = User::create([
         'name' => $request->name,
         'email' => $request->email,
         'password' => Hash::make($request->password),
-        'roles' => '0',
     ]);
 
-    Auth::login($user);
-    $request->session()->regenerate();
+  UserRole::create([
+            'UserID' => $user->id,
+            'RoleName' => 'user',
+            'Description' => 'Normal user',
+        ]);
 
-    return redirect()->route('thome');
-  }
+        Auth::login($user);
+
+        return redirect()->route('Orgdashboard')->with('success', 'Registration successful!');
+    }
+
   ```
 
 - **LoginRequest:**
@@ -153,26 +167,27 @@ Laravel provides robust validation features, including custom rules, regex patte
   ```
 **Controller Logic For Login:**
    ```php
-   public function loginWithEmail(LoginRequest $request)
-{
-    $credentials = $request->only('email', 'password');
+   public function login(Request $request)
+    {
+        // Attempt to authenticate the user
+        $credentials = $request->only('email', 'password');
 
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
 
-        $user = Auth::user();
+            $user = Auth::user();
 
-        if ($user->roles == '1') {
-            return redirect()->route('transaction.index');
-        } else {
-            return redirect()->route('thome');
+            if ($user->roles == '1' || $user->roles == 1) {
+                return redirect()->route('transaction.index');
+            } else {
+                return redirect()->route('Orgdashboard');
+            }
         }
-    }
 
-    return back()->withErrors([
-        'email' => 'The provided credentials do not match our records.',
-    ]);
-}
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ]);
+    }
   ```
 
 ### Authentication
