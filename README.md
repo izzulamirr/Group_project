@@ -223,21 +223,65 @@ public function register(Request $request)
 
 
 **Ratelimiting**
-- The login attempts to 3 failure per 2 minutes
+- The login attempts to 3 failure per 1 minute
 **LoginController**
 ```php
 if (RateLimiter::tooManyAttempts($key, 3)) {
     $seconds = RateLimiter::availableIn($key);
     return back()->withErrors([
-        'email' => "Too many login attempts. Please try again in $seconds seconds."
+        'email' => "Too many login attempts. Please try again inseconds."
     ]);
 }
 // ...
-RateLimiter::hit($key, 120);
+RateLimiter::hit($key, 60);
 ```
 **Explanation**
 - This protects against brute-force attacks by temporarily locking out users after repeated failures.
 
+
+**Locked Login Sessions**
+- After the ratelimiter activate, the login page will be locked and unable to input credentials. 
+```php
+
+public function showLoginForm(Request $request)
+{
+    $locked = false;
+    $seconds = 0;
+    $ip = $request->ip();
+    $key = 'login-attempts:|' . $ip;
+
+    if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 3)) {
+        $locked = true;
+        $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($key);
+    }
+
+    return view('auth.login', compact('locked', 'seconds'));
+}
+```
+**Explaination**
+```markdown
+**Locked Login Sessions**
+- After the rate limiter is activated, the login page will be locked and users will be unable to input their credentials until the lockout period expires.
+
+```php
+public function showLoginForm(Request $request)
+{
+    $locked = false;
+    $seconds = 0;
+    $ip = $request->ip();
+    $key = 'login-attempts:|' . $ip;
+
+    if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 3)) {
+        $locked = true;
+        $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($key);
+    }
+
+    return view('auth.login', compact('locked', 'seconds'));
+}
+```
+
+**Explanation**
+- This approach protects the application from brute-force attacks by making it difficult for attackers to repeatedly guess passwords. It also improves user experience by clearly communicating the lockout status and remaining wait time.
 
 - **Session Management:**  
   Session IDs are strong, regenerated on login, invalidated on logout.
