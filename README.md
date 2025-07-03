@@ -4,9 +4,9 @@
 ## Group Members
 | Member                      | Matric ID | Assigned Tasks                                                    |
 |-----------------------------|-----------|-------------------------------------------------------------------|
-| Izzul Amir Bin Zulkifly     | 2118091   | Authorization, File Security Principles, Database Security Principles, XSS and CSRF Prevention |
-| Haziq Uzair                 | 2112757   | Authentication, 2 Factor Authentication                                                              |
-| Johan Adam                  | 2116387   | Input Validation, Add Regex, Login and Register Request File, Profile Page |
+| Izzul Amir Bin Zulkifly     | 2118091   | Authorization, Web Browser Security |
+| Haziq Uzair                 | 2112757   | Authentication, File Security       |                                                        |
+| Johan Adam                  | 2116387   | Input Validation, Database Security |
 
 ---
 
